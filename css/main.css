@@ -1,0 +1,193 @@
+/* Base per REM - 1rem = 13.2px */
+html {
+    font-size: 13.2px;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Riduzione globale dimensioni del 25% */
+* {
+    font-size: 0.75em; /* Riduzione base del 25% */
+}
+
+body {
+    font-size: 1rem; /* Base 13.2px */
+    background-color: #ffffff;
+    color: #000000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", Arial, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container fluid con altezza fissa */
+.container-fluid {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 13.2px;
+    box-sizing: border-box;
+    gap: 0;
+}
+
+/* Main container per split-view */
+.main-container {
+    display: flex;
+    width: 100%;
+    gap: 0;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+    position: relative; /* Necessario per il posizionamento assoluto del detail-panel quando diventa overlay */
+}
+
+/* Sezione lista (sinistra) */
+.list-section {
+    width: 100%;
+    transition: width 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    height: 100%;
+}
+
+.list-section.panel-open {
+    width: 70%;
+    min-width: 600px;
+}
+
+/* Quando il panel diventa overlay (schermo < 980px), la lista occupa tutto lo spazio */
+@media (max-width: 980px) {
+    .list-section.panel-open {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+/* Filter Bar Container - occupa tutta la larghezza, sopra il main-container */
+#filterBarContainer {
+    width: calc(100% + 26.4px); /* Estende oltre il padding del container */
+    margin-left: -13.2px;
+    margin-right: -13.2px;
+    flex-shrink: 0;
+    overflow: visible;
+    margin-bottom: 0;
+}
+
+/* Container lista approvazioni - scrollabile */
+.approval-list {
+    max-width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+}
+
+/* Scrollbar moderna e sottile */
+.approval-list::-webkit-scrollbar {
+    width: 3px;
+}
+
+.approval-list::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+}
+
+.approval-list::-webkit-scrollbar-thumb {
+    background: rgba(192, 192, 192, 0.4);
+    border-radius: 3px;
+    transition: background 0.2s ease;
+}
+
+.approval-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(160, 160, 160, 0.6);
+}
+
+/* Firefox */
+.approval-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(192, 192, 192, 0.4) transparent;
+}
+
+/* Empty state container - occupa tutto lo spazio del padre */
+.empty-state-container {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Immagine empty state - larghezza proporzionata, altezza 30%, opacity 0.5 */
+.empty-state-image {
+    width: auto;
+    height: 30%;
+    opacity: 0.5;
+    object-fit: contain;
+}
+
+/* Etichetta sezione reparto */
+.reparto-section-label {
+    font-size: 0.9075rem; /* 11.98px - aumentato del 10% */
+    font-weight: 700;
+    color: #333333;
+    padding: 8.8px 13.2px;
+    margin-top: 22px;
+    margin-bottom: 8.8px;
+    margin-left: -13.2px; /* Compensa il padding px-3 del contenitore approval-list */
+    margin-right: -13.2px; /* Compensa il padding px-3 del contenitore approval-list */
+    width: calc(100% + 26.4px); /* Estende oltre il padding del contenitore */
+    display: flex;
+    align-items: center;
+    gap: 8.8px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #ffffff;
+    box-shadow: none;
+    transition: box-shadow 0.3s ease-in-out;
+    box-sizing: border-box;
+}
+
+.reparto-section-label.has-shadow {
+    box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.12),
+        0 2px 4px -1px rgba(0, 0, 0, 0.08);
+}
+
+.reparto-section-label:first-child {
+    margin-top: 0;
+}
+
+.reparto-section-label::before {
+    content: "";
+    flex: 0 0 calc(20% - 13.2px);
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        #d0d0d0 20%,
+        #d0d0d0 80%,
+        transparent
+    );
+}
+
+.reparto-section-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        #d0d0d0 20%,
+        #d0d0d0 80%,
+        transparent
+    );
+}
+
+

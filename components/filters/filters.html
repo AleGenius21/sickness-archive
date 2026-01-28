@@ -1,0 +1,77 @@
+<!-- Filter Bar Component -->
+<div class="filter-bar-container">
+    <div class="filter-bar">
+        <!-- Ricerca Testuale -->
+        <div class="filter-group">
+            <label class="filter-label" for="filterSearch">Ricerca:</label>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input 
+                    type="text" 
+                    class="form-control border-start-0" 
+                    id="filterSearch" 
+                    placeholder="Cerca dipendente..."
+                    aria-label="Cerca dipendente"
+                />
+            </div>
+        </div>
+
+        <!-- Filtro Tipologia -->
+        <div class="filter-group">
+            <label class="filter-label" for="filterType">Tipo:</label>
+            <select class="form-select form-select-sm" id="filterType" aria-label="Filtra per tipologia">
+                <option value="">Tutti</option>
+                <!-- Opzioni verranno aggiunte dinamicamente via JS -->
+            </select>
+        </div>
+
+        <!-- Filtro Reparto -->
+        <div class="filter-group">
+            <label class="filter-label" for="filterReparto">Reparto:</label>
+            <select class="form-select form-select-sm" id="filterReparto" aria-label="Filtra per reparto">
+                <option value="">Tutti</option>
+                <!-- Opzioni verranno aggiunte dinamicamente via JS -->
+            </select>
+        </div>
+
+        <!-- Filtro Mansione -->
+        <div class="filter-group">
+            <label class="filter-label" for="filterMansione">Mansione:</label>
+            <select class="form-select form-select-sm" id="filterMansione" aria-label="Filtra per mansione">
+                <option value="">Tutti</option>
+                <!-- Opzioni verranno aggiunte dinamicamente via JS -->
+            </select>
+        </div>
+
+        <!-- Ordinamento -->
+        <div class="filter-group">
+            <label class="filter-label" for="filterSort">Ordina:</label>
+            <select class="form-select form-select-sm" id="filterSort" aria-label="Ordina per">
+                <option value="data-recente">Richiesta più recente</option>
+                <option value="urgenza-decrescente">Richiesta meno recente</option>
+            </select>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="filter-group filter-group-reset">
+            <button 
+                type="button" 
+                class="btn-reset-filters" 
+                id="filterReset"
+                aria-label="Reset filtri"
+                disabled
+            >
+                <i class="bi bi-arrow-counterclockwise"></i>
+                <span>Resetta filtri</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Active Filters Chips Container -->
+    <div class="active-filters-container" id="activeFiltersContainer">
+        <!-- Chips verranno generate dinamicamente via JS -->
+    </div>
+</div>
+
