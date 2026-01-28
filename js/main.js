@@ -89,6 +89,47 @@ function transformCertificateData(item, index) {
         }]
     };
     
+    // Costruisci oggetto residenza strutturato
+    const residenza = {
+        via: cert.res_via || '',
+        civico: cert.res_civico || '',
+        cap: cert.res_cap || '',
+        comune: cert.res_comune || '',
+        provincia: cert.res_provincia || ''
+    };
+    
+    // Costruisci oggetto reperibilità strutturato (può essere null se coincide con residenza)
+    const reperibilita = (cert.rep_via || cert.rep_comune) ? {
+        indirizzo: {
+            via: cert.rep_via || '',
+            civico: cert.rep_civico || '',
+            cap: cert.rep_cap || '',
+            comune: cert.rep_comune || '',
+            provincia: cert.rep_provincia || ''
+        },
+        cognome: null // Campo presente nel PDF ma non nel mockdata attuale
+    } : null;
+    
+    // Costruisci oggetto medico strutturato
+    const medico = {
+        cf: cert.medico_cf,
+        cognome: cert.medico_cognome,
+        nome: cert.medico_nome,
+        codiceRegione: cert.medico_codiceRegione,
+        codiceAsl: cert.medico_codiceAsl
+    };
+    
+    // Costruisci oggetto lavoratore strutturato
+    const lavoratore = {
+        cf: cert.lav_cf,
+        cognome: cert.lav_cognome,
+        nome: cert.lav_nome,
+        sesso: cert.lav_sesso,
+        dataNascita: cert.lav_dataNascita,
+        comuneNascita: cert.lav_comuneNascita,
+        provinciaNascita: cert.lav_provinciaNascita
+    };
+    
     return {
         id: cert.id || (index + 1000), // Usa l'ID del certificato se disponibile, altrimenti genera
         cf: persona.cf || cert.lav_cf,
@@ -115,7 +156,8 @@ function transformCertificateData(item, index) {
         profile_pic: persona.profile_pic || null, // Verrà generato automaticamente dal component se null
         moorea_obj: moorea_obj,
         moorea_id: cert.idCertificato,
-        // Dati specifici del certificato
+        // Dati specifici del certificato INPS
+        idCertificato: cert.idCertificato,
         medico_cf: cert.medico_cf,
         medico_nome: `${cert.medico_nome} ${cert.medico_cognome}`,
         medico_codiceRegione: cert.medico_codiceRegione,
@@ -125,7 +167,17 @@ function transformCertificateData(item, index) {
         tipoCertificatoDesc: tipoCertificatoDesc,
         tipoVisita: cert.tipoVisita,
         tipoVisitaDesc: tipoVisitaDesc,
-        dataRilascio: cert.dataRilascio
+        dataRilascio: cert.dataRilascio,
+        ruoloMedico: cert.ruoloMedico,
+        // Oggetti strutturati per la nuova card
+        residenza: residenza,
+        reperibilita: reperibilita,
+        medico: medico,
+        lavoratore: lavoratore,
+        // Campi opzionali da PDF (non presenti nel mockdata attuale)
+        giornataLavorata: cert.giornataLavorata || false,
+        trauma: cert.trauma || false,
+        agevolazioni: cert.agevolazioni || null
     };
 }
 

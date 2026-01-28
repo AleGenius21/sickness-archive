@@ -1,406 +1,252 @@
-/* Stile card certificato malattia */
-.sickness-card {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    padding: 8.8px 13.2px;
-    border: none;
-    box-shadow: 1px 1px 7px #d3d3d373;
+/* --- INIZIO STILE SICKNESS CARD PROFESSIONAL (sc-pro) --- */
+:root {
+    --sc-pro-bg: #ffffff;
+    --sc-pro-hover: #f9fafb;
+    --sc-pro-border: #e5e7eb;
+    --sc-pro-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    --sc-pro-text-main: #111827;
+    --sc-pro-text-sub: #6b7280;
+    --sc-pro-accent: #2563eb; /* Blu professionale */
+    --sc-pro-red: #dc2626;
+    --sc-pro-green: #16a34a;
+}
+
+/* Container principale della card */
+.sc-pro-card-wrapper {
+    width: 100%;
+    background-color: var(--sc-pro-bg);
     border-radius: 10px;
-    background-color: #ffffff;
-    margin-bottom: 21px;
-    transition: background-color 0.2s ease;
-    gap: 22px;
-    cursor: pointer;
-    position: relative;
-    container-type: inline-size;
-    container-name: sickness-card-container;
-    min-width: 592px;
+	border: none;
+    box-shadow: 1px 1px 7px #d3d3d373;
+    margin-bottom: 16px;
     overflow: hidden;
-    height: 75px;
+    transition: all 0.2s ease;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.sickness-card:hover {
-	background-color: #f5f5f5;
+.sc-pro-card-wrapper:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    background-color: var(--sc-pro-hover);
 }
 
-/* Sezione profilo dipendente (sinistra) */
-.employee-profile {
-	display: flex;
-	align-items: center;
-	gap: 8.8px;
-	min-width: 220px;
-	flex-shrink: 0;
+/* Header (La parte sempre visibile) */
+.sc-pro-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
-.employee-avatar {
-	width: 43px;
-	height: 43px;
-	border-radius: 50%;
-	object-fit: cover;
-	border: 1px solid #d0d0d0;
-	flex-shrink: 0;
+/* Sezione Profilo Utente */
+.sc-pro-user-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 210px;
 }
 
-.employee-info {
-	display: flex;
-	flex-direction: column;
-	gap: 4.4px;
+.sc-pro-avatar {
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--sc-pro-border);
 }
 
-.employee-name {
-	font-weight: 700;
-	font-size: 0.917rem;
-	/* 12.1px */
-	color: #000000;
-	margin: 0;
-	line-height: 1.2;
-
-	/* Ellipsis */
-	max-width: 140px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.employee-badges {
-	display: flex;
-	gap: 4.4px;
-	flex-wrap: wrap;
-	max-width: 140px;
-}
-
-.badge-mansione,
-.badge-reparto {
-	font-size: 0.63rem;
-	padding: 0.1rem 0.3rem 0.05rem 0.3rem;
-	border-radius: 6px;
-	border: none;
-	font-weight: 600;
-	max-width: 73px;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-.badge-mansione {
-	background-color: #F5F5F5;
-	color: #666666;
-}
-
-.badge-reparto {
-	background-color: #E1E5E9;
-	color: #2c2c2c;
-}
-
-/* Sezione dettagli richiesta (centro) */
-.request-details {
-	display: flex;
-	align-items: center;
-	gap: 65px;
-	flex: 1;
-	flex-wrap: nowrap;
-}
-
-.request-type-badge {
-	font-size: 0.75rem;
-	padding: 3px 10px;
-	border-radius: 3.3px;
-	border: none;
-	font-weight: 600;
-	white-space: nowrap;
-	flex-shrink: 0;
-	width: 110px;
-	text-align: center;
-}
-
-.badge-malattia {
-	background-color: #dc2626;
-	/* red-600 - colore rosso per malattia */
-	color: #ffffff;
-}
-
-.request-quantity {
+.sc-pro-user-info {
 	display: flex;
 	flex-direction: column;
-	/* Impila verticalmente */
-	align-items: center;
-	/* Centra orizzontalmente */
-	justify-content: center;
-	line-height: 1;
-	/* Riduce lo spazio tra le righe */
-	min-width: 75px;
-	/* Assicura una larghezza minima */
-	position: relative;
+	gap: 4.5px;
 }
 
-.qty-number {
-	font-size: 1.7rem;
-	/* Dimensione grande */
-	font-weight: 600;
-	/* Molto grassetto */
-	color: #111111;
-	/* Nero intenso */
-	letter-spacing: 1px;
+.sc-pro-user-info p {
+    font-weight: 700;
+    font-size: 0.917rem;
+    color: #000000;
+    margin: 0;
+    line-height: 1.2;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.qty-label {
-	font-size: 0.635rem;
-	/* Molto piccolo */
-	font-weight: 600;
-	text-transform: uppercase;
-	/* Tutto maiuscolo */
-	color: #6e6e6e;
-	/* Grigio per meno enfasi */
-	letter-spacing: 0.8px;
-	position: absolute;
-	top: calc(100% + 4px);
-	left: 50%;
-	transform: translateX(-50%);
-	text-align: center;
-	white-space: nowrap;
+.sc-pro-badges {
+    display: flex;
+    gap: 4.4px;
+    flex-wrap: wrap;
+    max-width: 140px;
 }
 
-/* Caso speciale: qty-label dentro qty-row-bottom (ore non intere) */
-.qty-row-bottom .qty-label {
-	position: absolute;
-	top: calc(100% + 4px);
-	left: 50%;
-	transform: translateX(-50%);
-	margin-top: 0;
-}
-
-.qty-columns-wrapper {
-	display: inline-flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: flex-start;
-	gap: 0;
-}
-
-.qty-row-top {
-	display: flex;
-	flex-direction: row;
-	align-items: baseline;
-	justify-content: center;
-}
-
-.qty-row-bottom {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	margin-top: 6px;
-	position: relative;
-}
-
-.qty-column {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: flex-start;
-	text-align: center;
-}
-
-.qty-column-minutes {
-	flex-direction: row;
-	align-items: baseline;
-	gap: 4px;
-}
-
-.qty-minutes-number,
-.qty-hours-h {
-	font-size: 1.19rem;
-	/* 70% del font-size del numero (1.7rem * 0.7 = 1.19rem) */
-	font-weight: 600;
-	/* Stesso grassetto del numero principale */
-	color: #111111;
-	/* Nero come il numero */
-	letter-spacing: 1px;
-}
-
-.qty-minutes-label {
-	font-size: 0.635rem;
-	/* Stessa dimensione di qty-label */
-	font-weight: 600;
-	text-transform: lowercase;
-	color: #111111;
-	/* Nero come il numero */
-	letter-spacing: 0.8px;
-	margin-top: 0;
-	/* Nessun margine verticale quando è affiancato al numero */
-}
-
-/* Stile per la data Ferie (Unica riga, non grassetto) */
-.date-range-normal {
-	font-size: 1.22rem;
-	font-weight: 600;
-	color: #000000;
-	white-space: nowrap;
-}
-
-/* Stile per il nome del giorno (es. "Gio") nei permessi */
-.request-datetime .day-name {
-	margin-right: 6px;
-	line-height: 1;
-    font-size: 1rem;
+.sc-pro-badge {
+    font-size: 0.63rem;
     font-weight: 600;
+    padding: 0.1rem 0.3rem 0.05rem 0.3rem;
+	border-radius: 6px;
+	max-width: 73px;
+    border: none;
+
+	overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-/* Stile per le preposizioni "Da" e "a" nelle ferie */
-.date-preposition {
-	font-size: 1rem;
-	font-weight: 600;
+.sc-pro-badge.dept { 
+	background-color: #E1E5E9; 
+	color: #585858;
+}
+.sc-pro-badge.role { 	
+	background-color: #F5F5F5;
+	color: #666666; 
+}
+/* Sezione Centrale (Info Malattia) */
+.sc-pro-main-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    min-width: 420px;
+    flex: 2;
 }
 
-.request-datetime {
-	font-size: 1.22rem;
-	font-weight: 600;
-	/* Font-size minimo */
-	color: #000000;
+.sc-pro-type-box {
+    text-align: center;
+	min-width: 150px;
+}
+
+.sc-pro-type-label {
+    display: block;
+    font-size: 10px;
+    color: var(--sc-pro-text-sub);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.sc-pro-type-value {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--sc-pro-red);
+    background: #ffe7e7;
+    padding: 2px 16px;
+    border-radius: 20px;
+    border: none;
+}
+
+.sc-pro-date-box {
+    display: flex;
+    flex-direction: column;
+	min-width: 210px;
+	line-height: 1.23;
+
+}
+
+.sc-pro-date-main {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--sc-pro-text-main);
 	white-space: nowrap;
-	display: flex;
-	align-items: center;
 }
 
-.request-datetime>* {
-	font-size: 1.22rem;	
-	font-weight: 600;
-	/* Assicura che tutti i figli abbiano almeno 0.835rem */
+.sc-pro-duration {
+    font-size: 12px;
+    color: var(--sc-pro-text-sub);
+    font-weight: 500;
 }
 
-.datetime-separator {
-	margin: 0 8.8px;
-	/* Spazio maggiore tra data e orari */
-	color: #000000;
-	margin-bottom: 4px;
+/* Sezione Azioni (Arrow) */
+.sc-pro-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.datetime-time {
-	color: #000000;
+.sc-pro-arrow {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f3f4f6;
+    transition: transform 0.3s ease, background 0.2s;
+    color: #6b7280;
 }
 
-/* Wrapper per gli elementi della riga richiesta */
-
-/* 1. Wrapper TIPO */
-.rd-wrapper-type {
-	min-width: 90px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	position: relative;
-	overflow: visible;
+.sc-pro-card-wrapper.open .sc-pro-arrow {
+    transform: rotate(180deg);
+    background: #e5e7eb;
+    color: #111827;
 }
 
-.rd-wrapper-quantity {
-	min-width: 45px;
-	display: flex;
-	align-items: center;
+/* Accordion Body (Dettagli nascosti) */
+.sc-pro-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
+    background-color: #fcfcfc;
+    border-top: 1px solid var(--sc-pro-border);
 }
 
-/* 2. Wrapper DATA */
-.rd-wrapper-datetime {
-	min-width: 165px;
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-	gap: 35px;
-	overflow: visible;
+.sc-pro-card-wrapper.open .sc-pro-body {
+    max-height: 500px; /* Altezza sufficiente per il contenuto */
+    transition: max-height 0.4s ease-in-out;
 }
 
-/* Icona stato all'estremo destro */
-.sickness-card-status-icon {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-	margin-left: auto;
-	padding-left: 13.2px;
+.sc-pro-details-grid {
+    display: grid;
+	background: linear-gradient(0deg, #ffffefd9, transparent);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 24px;
 }
 
-.sickness-card-status-icon i {
-	font-size: 1.2rem;
-	line-height: 1;
+.sc-pro-detail-group h5 {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 4px;
 }
 
-.sickness-card-status-icon.status-approved i {
-	color: #22c55e; /* green-500 */
+.sc-pro-field {
+    margin-bottom: 8px;
 }
 
-.sickness-card-status-icon.status-rejected i {
-	color: #ef4444; /* red-500 */
+.sc-pro-label {
+    font-size: 12px;
+    color: var(--sc-pro-text-sub);
+    margin-right: 6px;
 }
 
-/* 
-   LOGICA DI POSIZIONAMENTO RESPONSIVE (Larghezza Card < 620px)
-   Usiamo @container query sulla card stessa.
-*/
-@container sickness-card-container (max-width: 586px) {
-
-	/* Limita la larghezza del profilo dipendente quando la card è stretta */
-	.employee-profile {
-		min-width: 0;
-		max-width: 140px !important;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.employee-info {
-		display: flex;
-		flex-direction: column;
-		gap: 4.4px;
-		text-overflow: ellipsis;
-		overflow: hidden;
-	}
-
-	.employee-name {
-		font-weight: 700;
-		font-size: 0.917rem;
-		/* 12.1px */
-		color: #000000;
-		margin: 0;
-		line-height: 1.2;
-
-		/* Ellipsis */
-		max-width: 98%;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	/* qty-label torna relativo su schermi stretti */
-	.qty-label {
-		position: relative !important;
-		top: auto !important;
-		left: auto !important;
-		transform: none !important;
-		margin-top: 6px !important;
-	}
-
-	.qty-row-bottom .qty-label {
-		position: relative !important;
-		top: auto !important;
-		left: auto !important;
-		transform: none !important;
-		margin-top: 0 !important;
-	}
+.sc-pro-value {
+    font-size: 13px;
+    color: var(--sc-pro-text-main);
+    font-weight: 500;
 }
 
-/* Responsive adjustments generali */
+.sc-pro-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 4px;
+}
+.tag-ssn { background: #dbeafe; color: #1e40af; }
+.tag-privato { background: #fce7f3; color: #9d174d; }
+.tag-amb { background: #d1fae5; color: #065f46; }
+.tag-dom { background: #ffedd5; color: #9a3412; }
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-	.sickness-card {
-		flex-wrap: wrap;
-		padding: 6.6px 8.8px;
-	}
-
-	.employee-profile {
-		min-width: 100%;
-		margin-bottom: 4.4px;
-	}
-
-	.request-details {
-		min-width: 100%;
-		margin-bottom: 4.4px;
-	}
+    .sc-pro-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .sc-pro-main-info { width: 100%; justify-content: space-between; margin-top: 8px; }
+    .sc-pro-actions { position: absolute; top: 16px; right: 16px; }
+    .sc-pro-card-wrapper { position: relative; }
 }
+/* --- FINE STILE SICKNESS CARD PROFESSIONAL --- */
