@@ -14,6 +14,7 @@
 /* Container principale della card */
 .sc-pro-card-wrapper {
     width: 100%;
+	min-width: 800px;
     background-color: var(--sc-pro-bg);
     border-radius: 10px;
 	border: none;
@@ -37,7 +38,7 @@
     padding: 16px 20px;
     cursor: pointer;
     gap: 16px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 /* Sezione Profilo Utente */
@@ -168,16 +169,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    background: #f3f4f6;
     transition: transform 0.3s ease, background 0.2s;
     color: #6b7280;
 }
 
+.sc-pro-arrow i {
+	transform: rotate(90deg);
+    font-size: 1.1rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .sc-pro-card-wrapper.open .sc-pro-arrow {
     transform: rotate(180deg);
-    background: #e5e7eb;
-    color: #111827;
 }
 
 /* Accordion Body (Dettagli nascosti) */
@@ -186,12 +192,12 @@
     overflow: hidden;
     transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
     background-color: #fcfcfc;
-    border-top: 1px solid var(--sc-pro-border);
 }
 
 .sc-pro-card-wrapper.open .sc-pro-body {
     max-height: 500px; /* Altezza sufficiente per il contenuto */
     transition: max-height 0.4s ease-in-out;
+    border-top: 1px solid var(--sc-pro-border);
 }
 
 .sc-pro-details-grid {

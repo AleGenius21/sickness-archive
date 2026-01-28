@@ -139,7 +139,7 @@ function createInpsSicknessCard(data) {
 
         <div class="sc-pro-actions">
             <div class="sc-pro-arrow">
-                <i class="bi bi-chevron-down"></i>
+                <i class="bi bi-chevron-right"></i>
             </div>
         </div>
     `;
