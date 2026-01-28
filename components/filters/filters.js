@@ -1362,7 +1362,7 @@ function renderList(data) {
     if (repartiCount < 2) {
         // Renderizza direttamente tutte le richieste senza raggruppamento
         data.forEach(function(requestData) {
-            const row = createApprovalRow(requestData);
+            const row = createSicknessCard(requestData);
             list.appendChild(row);
         });
     } else {
@@ -1381,7 +1381,7 @@ function renderList(data) {
             list.appendChild(label);
 
             groups[rep].forEach(req => {
-                list.appendChild(createApprovalRow(req));
+                list.appendChild(createSicknessCard(req));
             });
         });
     }
@@ -1400,9 +1400,9 @@ function initHeaderShadows() {
     const headers = approvalList.querySelectorAll('.reparto-section-label');
     
     headers.forEach(function(header) {
-        // Trova il primo elemento approval-row dopo l'header
+        // Trova il primo elemento sickness-card dopo l'header
         let firstRow = header.nextElementSibling;
-        while (firstRow && !firstRow.classList.contains('approval-row')) {
+        while (firstRow && !firstRow.classList.contains('sickness-card')) {
             firstRow = firstRow.nextElementSibling;
         }
 

@@ -1,0 +1,406 @@
+/* Stile card certificato malattia */
+.sickness-card {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 8.8px 13.2px;
+    border: none;
+    box-shadow: 1px 1px 7px #d3d3d373;
+    border-radius: 10px;
+    background-color: #ffffff;
+    margin-bottom: 21px;
+    transition: background-color 0.2s ease;
+    gap: 22px;
+    cursor: pointer;
+    position: relative;
+    container-type: inline-size;
+    container-name: sickness-card-container;
+    min-width: 592px;
+    overflow: hidden;
+    height: 75px;
+}
+
+.sickness-card:hover {
+	background-color: #f5f5f5;
+}
+
+/* Sezione profilo dipendente (sinistra) */
+.employee-profile {
+	display: flex;
+	align-items: center;
+	gap: 8.8px;
+	min-width: 220px;
+	flex-shrink: 0;
+}
+
+.employee-avatar {
+	width: 43px;
+	height: 43px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 1px solid #d0d0d0;
+	flex-shrink: 0;
+}
+
+.employee-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4.4px;
+}
+
+.employee-name {
+	font-weight: 700;
+	font-size: 0.917rem;
+	/* 12.1px */
+	color: #000000;
+	margin: 0;
+	line-height: 1.2;
+
+	/* Ellipsis */
+	max-width: 140px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.employee-badges {
+	display: flex;
+	gap: 4.4px;
+	flex-wrap: wrap;
+	max-width: 140px;
+}
+
+.badge-mansione,
+.badge-reparto {
+	font-size: 0.63rem;
+	padding: 0.1rem 0.3rem 0.05rem 0.3rem;
+	border-radius: 6px;
+	border: none;
+	font-weight: 600;
+	max-width: 73px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.badge-mansione {
+	background-color: #F5F5F5;
+	color: #666666;
+}
+
+.badge-reparto {
+	background-color: #E1E5E9;
+	color: #2c2c2c;
+}
+
+/* Sezione dettagli richiesta (centro) */
+.request-details {
+	display: flex;
+	align-items: center;
+	gap: 65px;
+	flex: 1;
+	flex-wrap: nowrap;
+}
+
+.request-type-badge {
+	font-size: 0.75rem;
+	padding: 3px 10px;
+	border-radius: 3.3px;
+	border: none;
+	font-weight: 600;
+	white-space: nowrap;
+	flex-shrink: 0;
+	width: 110px;
+	text-align: center;
+}
+
+.badge-malattia {
+	background-color: #dc2626;
+	/* red-600 - colore rosso per malattia */
+	color: #ffffff;
+}
+
+.request-quantity {
+	display: flex;
+	flex-direction: column;
+	/* Impila verticalmente */
+	align-items: center;
+	/* Centra orizzontalmente */
+	justify-content: center;
+	line-height: 1;
+	/* Riduce lo spazio tra le righe */
+	min-width: 75px;
+	/* Assicura una larghezza minima */
+	position: relative;
+}
+
+.qty-number {
+	font-size: 1.7rem;
+	/* Dimensione grande */
+	font-weight: 600;
+	/* Molto grassetto */
+	color: #111111;
+	/* Nero intenso */
+	letter-spacing: 1px;
+}
+
+.qty-label {
+	font-size: 0.635rem;
+	/* Molto piccolo */
+	font-weight: 600;
+	text-transform: uppercase;
+	/* Tutto maiuscolo */
+	color: #6e6e6e;
+	/* Grigio per meno enfasi */
+	letter-spacing: 0.8px;
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 50%;
+	transform: translateX(-50%);
+	text-align: center;
+	white-space: nowrap;
+}
+
+/* Caso speciale: qty-label dentro qty-row-bottom (ore non intere) */
+.qty-row-bottom .qty-label {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 50%;
+	transform: translateX(-50%);
+	margin-top: 0;
+}
+
+.qty-columns-wrapper {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 0;
+}
+
+.qty-row-top {
+	display: flex;
+	flex-direction: row;
+	align-items: baseline;
+	justify-content: center;
+}
+
+.qty-row-bottom {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	margin-top: 6px;
+	position: relative;
+}
+
+.qty-column {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	text-align: center;
+}
+
+.qty-column-minutes {
+	flex-direction: row;
+	align-items: baseline;
+	gap: 4px;
+}
+
+.qty-minutes-number,
+.qty-hours-h {
+	font-size: 1.19rem;
+	/* 70% del font-size del numero (1.7rem * 0.7 = 1.19rem) */
+	font-weight: 600;
+	/* Stesso grassetto del numero principale */
+	color: #111111;
+	/* Nero come il numero */
+	letter-spacing: 1px;
+}
+
+.qty-minutes-label {
+	font-size: 0.635rem;
+	/* Stessa dimensione di qty-label */
+	font-weight: 600;
+	text-transform: lowercase;
+	color: #111111;
+	/* Nero come il numero */
+	letter-spacing: 0.8px;
+	margin-top: 0;
+	/* Nessun margine verticale quando è affiancato al numero */
+}
+
+/* Stile per la data Ferie (Unica riga, non grassetto) */
+.date-range-normal {
+	font-size: 1.22rem;
+	font-weight: 600;
+	color: #000000;
+	white-space: nowrap;
+}
+
+/* Stile per il nome del giorno (es. "Gio") nei permessi */
+.request-datetime .day-name {
+	margin-right: 6px;
+	line-height: 1;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Stile per le preposizioni "Da" e "a" nelle ferie */
+.date-preposition {
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.request-datetime {
+	font-size: 1.22rem;
+	font-weight: 600;
+	/* Font-size minimo */
+	color: #000000;
+	white-space: nowrap;
+	display: flex;
+	align-items: center;
+}
+
+.request-datetime>* {
+	font-size: 1.22rem;	
+	font-weight: 600;
+	/* Assicura che tutti i figli abbiano almeno 0.835rem */
+}
+
+.datetime-separator {
+	margin: 0 8.8px;
+	/* Spazio maggiore tra data e orari */
+	color: #000000;
+	margin-bottom: 4px;
+}
+
+.datetime-time {
+	color: #000000;
+}
+
+/* Wrapper per gli elementi della riga richiesta */
+
+/* 1. Wrapper TIPO */
+.rd-wrapper-type {
+	min-width: 90px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	overflow: visible;
+}
+
+.rd-wrapper-quantity {
+	min-width: 45px;
+	display: flex;
+	align-items: center;
+}
+
+/* 2. Wrapper DATA */
+.rd-wrapper-datetime {
+	min-width: 165px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 35px;
+	overflow: visible;
+}
+
+/* Icona stato all'estremo destro */
+.sickness-card-status-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	margin-left: auto;
+	padding-left: 13.2px;
+}
+
+.sickness-card-status-icon i {
+	font-size: 1.2rem;
+	line-height: 1;
+}
+
+.sickness-card-status-icon.status-approved i {
+	color: #22c55e; /* green-500 */
+}
+
+.sickness-card-status-icon.status-rejected i {
+	color: #ef4444; /* red-500 */
+}
+
+/* 
+   LOGICA DI POSIZIONAMENTO RESPONSIVE (Larghezza Card < 620px)
+   Usiamo @container query sulla card stessa.
+*/
+@container sickness-card-container (max-width: 586px) {
+
+	/* Limita la larghezza del profilo dipendente quando la card è stretta */
+	.employee-profile {
+		min-width: 0;
+		max-width: 140px !important;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.employee-info {
+		display: flex;
+		flex-direction: column;
+		gap: 4.4px;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+
+	.employee-name {
+		font-weight: 700;
+		font-size: 0.917rem;
+		/* 12.1px */
+		color: #000000;
+		margin: 0;
+		line-height: 1.2;
+
+		/* Ellipsis */
+		max-width: 98%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* qty-label torna relativo su schermi stretti */
+	.qty-label {
+		position: relative !important;
+		top: auto !important;
+		left: auto !important;
+		transform: none !important;
+		margin-top: 6px !important;
+	}
+
+	.qty-row-bottom .qty-label {
+		position: relative !important;
+		top: auto !important;
+		left: auto !important;
+		transform: none !important;
+		margin-top: 0 !important;
+	}
+}
+
+/* Responsive adjustments generali */
+@media (max-width: 768px) {
+	.sickness-card {
+		flex-wrap: wrap;
+		padding: 6.6px 8.8px;
+	}
+
+	.employee-profile {
+		min-width: 100%;
+		margin-bottom: 4.4px;
+	}
+
+	.request-details {
+		min-width: 100%;
+		margin-bottom: 4.4px;
+	}
+}

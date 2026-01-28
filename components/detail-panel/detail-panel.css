@@ -307,14 +307,14 @@
 }
 
 /* Responsive adjustments */
-/* Quando lo schermo si restringe, il calendario diventa overlay e scorre sopra le approval-row */
+/* Quando lo schermo si restringe, il calendario diventa overlay e scorre sopra le sickness-card */
 /* Breakpoint: larghezza minima lista (600px) + larghezza minima calendario (380px) = 980px */
 @media (max-width: 980px) {
     .detail-panel.panel-open {
         /* Mantiene la larghezza minima assoluta */
         width: 380px;
         min-width: 380px;
-        /* Diventa overlay, scorre sopra le approval-row */
+        /* Diventa overlay, scorre sopra le sickness-card */
         position: absolute;
         right: 0;
         top: 0;
