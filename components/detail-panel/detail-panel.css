@@ -2,7 +2,8 @@
 
 /* Detail Panel Container */
 .detail-panel {
-    width: 0;
+    width: 30%;
+    min-width: 430px;
     overflow: hidden;
     background-color: #ffffff;
     border-left: 1px solid #e0e0e0;
@@ -17,7 +18,7 @@
 
 .detail-panel.panel-open {
     width: 30%;
-    min-width: 430PX;
+    min-width: 430px;
     overflow: hidden;
 }
 
@@ -294,11 +295,6 @@
     color: #ffffff;
 }
 
-/* Selected request highlight */
-.calendar-day.selected-request {
-    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4);
-    z-index: 5;
-}
 
 /* Indicatore stato approvato/rifiutato (Barra colorata laterale) */
 /* Poiché lo spazio è poco, usiamo un bordo destro colorato */

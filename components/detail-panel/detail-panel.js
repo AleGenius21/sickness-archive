@@ -419,7 +419,6 @@ function generateMonthCalendar(year, month, requests, selectedRequest) {
 		let hasSelectedRequest = false;
 
 		if (dayRequests.length > 0) {
-			dayCell.classList.add('has-requests');
 
 			// Conta certificati unici
 			dayRequests.forEach(({ request, certificate }) => {
@@ -437,10 +436,6 @@ function generateMonthCalendar(year, month, requests, selectedRequest) {
 
 			});
 
-			// Aggiungi classe per richiesta selezionata
-			if (hasSelectedRequest) {
-				dayCell.classList.add('selected-request');
-			}
 
 			// Crea container per i badge
 			const badgesContainer = document.createElement('div');
@@ -661,19 +656,8 @@ async function applyPeriodFilter(startDate, endDate) {
 		});
 	}
 
-	// Ripristina i filtri dalla configurazione API invece di usarli dai dati filtrati
-	// I filtri devono sempre mostrare tutte le opzioni disponibili dalla configurazione,
-	// non solo quelle presenti nel periodo selezionato
-	if (typeof window.fetchLeaveAdminScreenConfig === 'function' && typeof window.buildFiltersFromConfig === 'function') {
-		try {
-			const configData = await window.fetchLeaveAdminScreenConfig();
-			if (configData && typeof configData === 'object') {
-				window.buildFiltersFromConfig(configData);
-			} else {
-			} catch (error) {
-			console.warn('[DETAIL-PANEL] Errore nel ripristino filtri da config:', error);
-		}
-	}
+	// I filtri mantengono la configurazione cached iniziale, non serve ricaricarla
+	// La configurazione è gestita dal sistema di cache in filters.js
 
 	// Abilita i filtri solo se i dati sono stati caricati con successo
 	// (periodFilteredData può essere vuoto ma i dati esistono in allCalendarData)

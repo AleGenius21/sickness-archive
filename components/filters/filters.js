@@ -14,6 +14,7 @@ let allRequestsData = [];
 let filteredRequestsData = [];
 let filterOptionsData = []; // Dati completi per popolare le opzioni dei filtri (immutabili)
 let filterBarLoaded = false; // Flag per verificare se il componente è stato caricato
+let cachedConfigData = null; // Cache della configurazione iniziale dei filtri
 // Variabile globale per il periodo selezionato dal calendario
 window.selectedPeriod = null;
 // Variabile globale per debounce ricerca
@@ -211,11 +212,14 @@ function buildApiParams() {
 
 /**
  * Esegue chiamata API per ottenere richieste filtrate
+ * PER ORA USA MOCK DATA da window.allCalendarData
  * @param {Object} params - Parametri per la chiamata API
  * @returns {Promise<Array>} Promise che si risolve con array di richieste
  */
 async function fetchLeavesRequestsWithFilters(params) {
     try {
+        // COMMENTATO PER ORA - USA MOCK DATA
+        /*
         // Costruisce query string con URLSearchParams
         const queryParams = new URLSearchParams();
         
@@ -295,11 +299,107 @@ async function fetchLeavesRequestsWithFilters(params) {
 
         
         return finalData;
-    } catch (error) {
-        if (error.name === 'AbortError') {
-            throw new Error('Timeout: la richiesta ha impiegato troppo tempo');
+        */
+        
+        // ===== USA MOCK DATA =====
+        console.log('[FILTERS] Usando mock data da window.allCalendarData');
+        
+        // Ottieni tutti i dati dal mockdata caricato
+        let data = window.allCalendarData || [];
+        
+        if (data.length === 0) {
+            console.warn('[FILTERS] Nessun dato disponibile in window.allCalendarData');
+            return [];
         }
-        console.error('Errore nella chiamata API:', error);
+        
+        // 1. FILTRA SOLO MALATTIA
+        data = data.filter(item => {
+            const isMalattia = item.type_name === 'MALATTIA' || 
+                              item.tipo_richiesta === 'MALATTIA' ||
+                              item.type === 1;
+            return isMalattia;
+        });
+        
+        console.log('[FILTERS] Dopo filtro MALATTIA:', data.length, 'items');
+        
+        // 2. FILTRA PER NOME (se specificato)
+        if (params.nome && params.nome.trim()) {
+            const searchTerm = params.nome.trim().toLowerCase();
+            data = data.filter(item => {
+                const nominativo = (item.nominativo || '').toLowerCase();
+                return nominativo.includes(searchTerm);
+            });
+        }
+        
+        // 3. FILTRA PER TYPE_ID (se specificato)
+        if (params.type_id !== undefined) {
+            data = data.filter(item => item.type === params.type_id || item.type_id === params.type_id);
+        }
+        
+        // 4. FILTRA PER DEPARTMENT_ID (se specificato)
+        if (params.department_id !== undefined) {
+            data = data.filter(item => item.department_id === params.department_id);
+        }
+        
+        // 5. FILTRA PER TASK_ID (se specificato)
+        if (params.task_id !== undefined) {
+            data = data.filter(item => item.task_id === params.task_id);
+        }
+        
+        // 6. FILTRA PER PERIODO (se specificato)
+        if (params.data_inizio && params.data_fine) {
+            const startDate = new Date(params.data_inizio + 'T00:00:00');
+            const endDate = new Date(params.data_fine + 'T23:59:59');
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(23, 59, 59, 999);
+            
+            data = data.filter(item => {
+                // Controlla dataInizio e dataFine
+                const itemStartDate = item.dataInizio ? new Date(item.dataInizio + 'T00:00:00') : null;
+                const itemEndDate = item.dataFine ? new Date(item.dataFine + 'T00:00:00') : null;
+                
+                if (itemStartDate && !isNaN(itemStartDate.getTime())) {
+                    itemStartDate.setHours(0, 0, 0, 0);
+                    
+                    // Se c'è solo dataInizio, controlla se cade nel periodo
+                    if (!itemEndDate || isNaN(itemEndDate.getTime())) {
+                        if (itemStartDate >= startDate && itemStartDate <= endDate) {
+                            return true;
+                        }
+                    } else {
+                        // Se c'è un range, controlla se si sovrappone al periodo selezionato
+                        itemEndDate.setHours(23, 59, 59, 999);
+                        // Sovrapposizione: inizio item <= fine periodo E fine item >= inizio periodo
+                        if (itemStartDate <= endDate && itemEndDate >= startDate) {
+                            return true;
+                        }
+                    }
+                }
+                
+                return false;
+            });
+        }
+        
+        // 7. ORDINAMENTO
+        if (params.sort_by === 'dataInizio') {
+            data.sort((a, b) => {
+                const dateA = new Date(a.dataInizio || '1970-01-01');
+                const dateB = new Date(b.dataInizio || '1970-01-01');
+                
+                if (params.sort_order === 'desc') {
+                    return dateB - dateA; // Più recente prima
+                } else {
+                    return dateA - dateB; // Meno recente prima
+                }
+            });
+        }
+        
+        console.log('[FILTERS] Risultati finali:', data.length, 'items');
+        
+        return data;
+        
+    } catch (error) {
+        console.error('[FILTERS] Errore nel filtraggio mock data:', error);
         throw error;
     }
 }
@@ -330,6 +430,7 @@ async function initFilterBar(requestsData = []) {
         configData = await fetchLeaveAdminScreenConfig();
         
         if (configData && typeof configData === 'object') {
+            cachedConfigData = configData; // Cache config per successivi reset
             buildFiltersFromConfig(configData);
         } else {
             // Fallback se config fallisce
@@ -485,9 +586,9 @@ function updateFilterBarData(requestsData) {
     allRequestsData = [...requestsData];
     window.allRequestsData = allRequestsData; // Aggiorna anche la variabile globale
     
-    // Aggiorna filterOptionsData solo se è vuoto (per mantenere filtri statici)
-    // Se filterOptionsData è già popolato, non aggiornare le opzioni
-    if (filterOptionsData.length === 0) {
+    // NON aggiornare le opzioni dei filtri se abbiamo già una configurazione cached
+    // I filtri devono rimanere basati sulla configurazione iniziale da API
+    if (!cachedConfigData && filterOptionsData.length === 0) {
         filterOptionsData = [...requestsData];
         updateFilterOptions(filterOptionsData);
     }
@@ -1774,9 +1875,9 @@ async function loadAndDisplayDayData(selectedDate) {
         filteredRequestsData = [...dayRequests];
         window.filteredRequestsData = filteredRequestsData;
 
-        // Aggiorna filterOptionsData solo se è vuoto (per mantenere filtri statici)
-        // Se filterOptionsData è già popolato, non aggiornare le opzioni
-        if (filterOptionsData.length === 0) {
+        // NON aggiornare le opzioni dei filtri se abbiamo già una configurazione cached
+        // I filtri devono rimanere basati sulla configurazione iniziale da API
+        if (!cachedConfigData && filterOptionsData.length === 0) {
             filterOptionsData = [...dayRequests];
             updateFilterOptions(filterOptionsData);
         }
@@ -1901,30 +2002,12 @@ async function clearAllFilters() {
     const sortSelect = document.getElementById('filterSort');
     if (sortSelect) sortSelect.value = 'data-recente';
 
-    // Ricostruisci i filtri dalla configurazione (come all'inizializzazione)
-    try {
-        if (typeof fetchLeaveAdminScreenConfig === 'function') {
-            console.log('[FILTERS] Reset filtri: ricarico configurazione');
-            const configData = await fetchLeaveAdminScreenConfig();
-            if (configData && typeof configData === 'object') {
-                console.log('[FILTERS] Reset filtri: ricostruisco filtri da config');
-                buildFiltersFromConfig(configData);
-            } else {
-                console.warn('[FILTERS] Reset filtri: configData non valido, uso fallback');
-                // Fallback: usa updateFilterOptions se config non disponibile
-                if (filterOptionsData && filterOptionsData.length > 0) {
-                    updateFilterOptions(filterOptionsData);
-                }
-            }
-        } else {
-            console.warn('[FILTERS] Reset filtri: fetchLeaveAdminScreenConfig non disponibile, uso fallback');
-            // Fallback: usa updateFilterOptions se config non disponibile
-            if (filterOptionsData && filterOptionsData.length > 0) {
-                updateFilterOptions(filterOptionsData);
-            }
-        }
-    } catch (error) {
-        console.error('[FILTERS] Reset filtri: errore nel caricamento config, uso fallback:', error);
+    // Ricostruisci i filtri dalla configurazione cached (come all'inizializzazione)
+    if (cachedConfigData && typeof cachedConfigData === 'object') {
+        console.log('[FILTERS] Reset filtri: uso configurazione cached');
+        buildFiltersFromConfig(cachedConfigData);
+    } else {
+        console.warn('[FILTERS] Reset filtri: configurazione cached non disponibile, uso fallback');
         // Fallback: usa updateFilterOptions se config non disponibile
         if (filterOptionsData && filterOptionsData.length > 0) {
             updateFilterOptions(filterOptionsData);
