@@ -105,34 +105,6 @@ function buildApiParams() {
         params.nome = searchInput.value.trim();
     }
 
-    // Tipo (type_id) - estrae da attributo data-type-id
-    const typeSelect = document.getElementById('filterType');
-    if (typeSelect && typeSelect.value) {
-        const typeOption = typeSelect.selectedOptions[0];
-        if (typeOption) {
-            // Prova a leggere l'ID dall'attributo data-type-id
-            const typeIdAttr = typeOption.getAttribute('data-type-id');
-            if (typeIdAttr) {
-                params.type_id = parseInt(typeIdAttr, 10);
-            } else {
-                // Fallback: mappa il nome all'ID
-                const typeName = typeSelect.value;
-                const typeMap = {
-                    'Ferie': 1,
-                    'FERIE': 1,
-                    'Permessi': 2,
-                    'Permesso': 2,
-                    'PERMESSO': 2,
-                    'PERMESSI': 2
-                };
-                const mappedId = typeMap[typeName];
-                if (mappedId) {
-                    params.type_id = mappedId;
-                }
-            }
-        }
-    }
-
     // Reparto (department_id) - estrae da attributo data-department-id
     const repartoSelect = document.getElementById('filterReparto');
     if (repartoSelect && repartoSelect.value) {
@@ -329,11 +301,6 @@ async function fetchLeavesRequestsWithFilters(params) {
                 const nominativo = (item.nominativo || '').toLowerCase();
                 return nominativo.includes(searchTerm);
             });
-        }
-        
-        // 3. FILTRA PER TYPE_ID (se specificato)
-        if (params.type_id !== undefined) {
-            data = data.filter(item => item.type === params.type_id || item.type_id === params.type_id);
         }
         
         // 4. FILTRA PER DEPARTMENT_ID (se specificato)
@@ -613,35 +580,6 @@ function buildFiltersFromConfig(configData) {
 
     let success = false;
 
-    // Popola filtro Tipo
-    const tipoSelect = document.getElementById('filterType');
-    if (tipoSelect && Array.isArray(configData.types) && configData.types.length > 0) {
-        const currentValue = tipoSelect.value;
-        tipoSelect.innerHTML = '';
-        const newDefaultOption = document.createElement('option');
-        newDefaultOption.value = '';
-        newDefaultOption.textContent = 'Tutti';
-        tipoSelect.appendChild(newDefaultOption);
-
-        configData.types.forEach(function(type) {
-            if (type && type.type_id !== undefined && type.type_name) {
-                const option = document.createElement('option');
-                option.value = type.type_name;
-                option.textContent = type.type_name;
-                option.setAttribute('data-type-id', type.type_id.toString());
-                tipoSelect.appendChild(option);
-            }
-        });
-
-        if (currentValue && Array.from(tipoSelect.options).some(opt => opt.value === currentValue)) {
-            tipoSelect.value = currentValue;
-        } else {
-            tipoSelect.value = '';
-        }
-        // RIMOSSO: tipoSelect.disabled = false;
-        success = true;
-    }
-
     // Popola filtro Reparto
     const repartoSelect = document.getElementById('filterReparto');
     if (repartoSelect && Array.isArray(configData.blocks) && configData.blocks.length > 0) {
@@ -762,12 +700,6 @@ function updateFilterOptions(requests) {
             nameKey: 'task_name',
             idKey: 'task_id',
             dataAttribute: 'data-task-id'
-        },
-        {
-            id: 'filterType',
-            nameKey: 'type_name', // Nuovo campo
-            idKey: 'type',        // Nuovo campo ID
-            dataAttribute: 'data-type-id'
         }
     ];
 
@@ -1128,12 +1060,6 @@ function setupFilterListeners() {
         searchInput.addEventListener('input', handleSearchChange);
     }
 
-    // Filtro tipologia
-    const typeSelect = document.getElementById('filterType');
-    if (typeSelect) {
-        typeSelect.addEventListener('change', handleFilterChange);
-    }
-
     // Filtro reparto
     const repartoSelect = document.getElementById('filterReparto');
     if (repartoSelect) {
@@ -1167,7 +1093,6 @@ function setFiltersEnabled(enabled) {
     // Lista di tutti gli elementi da disabilitare/abilitare
     const filterElements = [
         'filterSearch',      // Input ricerca
-        'filterType',        // Select tipo
         'filterReparto',     // Select reparto
         'filterMansione',    // Select mansione
         'filterSort',        // Select ordinamento
@@ -1548,10 +1473,6 @@ function hasAnyActiveFilters() {
     const searchValue = document.getElementById('filterSearch')?.value.trim() || '';
     if (searchValue) return true;
 
-    // Verifica tipologia
-    const typeValue = document.getElementById('filterType')?.value || '';
-    if (typeValue) return true;
-
     // Verifica reparto (solo se il filtro non è nascosto)
     const repartoSelect = document.getElementById('filterReparto');
     const repartoFilterGroup = repartoSelect?.closest('.filter-group');
@@ -1601,20 +1522,6 @@ function updateActiveFiltersChips() {
             value: searchValue,
             remove: () => {
                 document.getElementById('filterSearch').value = '';
-                handleFilterChange();
-            }
-        });
-    }
-
-    // Tipologia
-    const typeValue = document.getElementById('filterType')?.value || '';
-    if (typeValue) {
-        activeFilters.push({
-            key: 'type',
-            label: 'Tipologia',
-            value: typeValue,
-            remove: () => {
-                document.getElementById('filterType').value = '';
                 handleFilterChange();
             }
         });
@@ -1979,10 +1886,6 @@ async function clearAllFilters() {
     // Reset ricerca
     const searchInput = document.getElementById('filterSearch');
     if (searchInput) searchInput.value = '';
-
-    // Reset tipologia
-    const typeSelect = document.getElementById('filterType');
-    if (typeSelect) typeSelect.value = '';
 
     // Reset reparto
     const repartoSelect = document.getElementById('filterReparto');

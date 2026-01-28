@@ -19,11 +19,15 @@ function formatDateString(date) {
 
 /**
  * Trasforma i dati del certificato di malattia in un formato compatibile con l'UI
- * @param {Object} cert - Certificato di malattia dal mockdata
+ * @param {Object} item - Oggetto con struttura {persona, certificato} dal mockdata
  * @param {number} index - Indice progressivo per generare ID univoci
  * @returns {Object} Oggetto formattato per l'UI
  */
-function transformCertificateData(cert, index) {
+function transformCertificateData(item, index) {
+    // Estrai oggetti persona e certificato dalla nuova struttura
+    const persona = item.persona || {};
+    const cert = item.certificato || {};
+    
     // Determina lo status: in questo caso tutti sono approvati (status: 1) perché sono certificati INPS validi
     const status = 1; // Approvato
     
@@ -86,8 +90,8 @@ function transformCertificateData(cert, index) {
     };
     
     return {
-        id: index + 1000, // Genera ID univoco
-        cf: cert.lav_cf,
+        id: cert.id || (index + 1000), // Usa l'ID del certificato se disponibile, altrimenti genera
+        cf: persona.cf || cert.lav_cf,
         created_at: cert.created_at,
         updated_at: cert.updated_at,
         dataInizio: cert.dataInizio,
@@ -101,14 +105,14 @@ function transformCertificateData(cert, index) {
         type: 1, // Usa type: 1 per malattia (riutilizziamo la logica delle ferie per consistenza)
         type_name: 'MALATTIA',
         tipo_richiesta: 'MALATTIA',
-        nominativo: `${cert.lav_nome} ${cert.lav_cognome}`,
-        department_id: null,
-        department_name: 'Nessun reparto',
-        department_color: '#E1E5E9',
-        task_id: null,
-        task_name: null,
-        task_color: null,
-        profile_pic: null, // Verrà generato automaticamente dal component
+        nominativo: persona.nominativo || `${cert.lav_nome} ${cert.lav_cognome}`,
+        department_id: persona.department_id || null,
+        department_name: persona.department_name || 'Nessun reparto',
+        department_color: persona.department_color || '#E1E5E9',
+        task_id: persona.task_id || null,
+        task_name: persona.task_name || null,
+        task_color: persona.task_color || null,
+        profile_pic: persona.profile_pic || null, // Verrà generato automaticamente dal component se null
         moorea_obj: moorea_obj,
         moorea_id: cert.idCertificato,
         // Dati specifici del certificato
