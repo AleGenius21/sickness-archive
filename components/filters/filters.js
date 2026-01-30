@@ -1763,7 +1763,7 @@ async function loadAndDisplayDayData(selectedDate) {
     }
     
     // Mostra spinner (solo se non c'è un filtro periodo attivo)
-    showFilterSpinner();
+    // showFilterSpinner(); // RIMOSSO su richiesta: non mostrare spinner nei filtri al click sul calendario
     showListSpinner();
 
     try {

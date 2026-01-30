@@ -12,6 +12,7 @@ let allCalendarData = []; // Tutti i dati disponibili per il calendario
 let selectedDay = null; // Giorno selezionato nel calendario {year, month, day}
 let selectedPeriodStart = null; // Data inizio periodo selezionato
 let selectedPeriodEnd = null; // Data fine periodo selezionato
+let defaultDateApplied = false; // Flag: applica periodo "oggi" solo al primo caricamento
 
 /**
  * Inizializza il componente detail panel
@@ -173,6 +174,9 @@ function loadCalendarData(data) {
 
 	// Renderizza il calendario
 	renderCalendar();
+
+	// Al primo caricamento: seleziona oggi di default ed esegui la chiamata di filtraggio
+	applyDefaultTodaySelection();
 }
 
 /**
@@ -574,6 +578,19 @@ async function handleDayClick(year, month, day) {
 			console.warn('loadAndDisplayDayData non disponibile. Assicurati che filters.js sia caricato.');
 		}
 	}
+}
+
+/**
+ * Applica il periodo "oggi" di default al primo caricamento e lancia la chiamata di filtraggio.
+ * Eseguita una sola volta (flag defaultDateApplied).
+ */
+function applyDefaultTodaySelection() {
+	if (defaultDateApplied) return;
+	defaultDateApplied = true;
+
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+	applyPeriodFilter(today, today);
 }
 
 /**

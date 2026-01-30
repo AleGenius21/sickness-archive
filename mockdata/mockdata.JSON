@@ -46,6 +46,9 @@
 		  "tipoCertificato": "C",
 		  "tipoVisita": "D",
 		  "ruoloMedico": "S",
+		  "giornataLavorata": true,
+		  "trauma": false,
+		  "agevolazioni": null,
 		  "external_id": null,
 		  "created_at": "2025-08-01 08:30:00",
 		  "updated_at": "2025-08-01 08:30:00"
@@ -97,6 +100,9 @@
 		  "tipoCertificato": "C",
 		  "tipoVisita": "A",
 		  "ruoloMedico": "S",
+		  "giornataLavorata": false,
+		  "trauma": true,
+		  "agevolazioni": "T",
 		  "external_id": null,
 		  "created_at": "2025-12-30 22:00:10",
 		  "updated_at": "2025-12-30 22:00:10"
@@ -148,6 +154,9 @@
 		  "tipoCertificato": "I",
 		  "tipoVisita": "D",
 		  "ruoloMedico": "S",
+		  "giornataLavorata": false,
+		  "trauma": false,
+		  "agevolazioni": "I",
 		  "external_id": null,
 		  "created_at": "2025-11-10 09:15:00",
 		  "updated_at": "2025-11-10 09:15:00"
