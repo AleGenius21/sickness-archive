@@ -13,6 +13,7 @@ let selectedDay = null; // Giorno selezionato nel calendario {year, month, day}
 let selectedPeriodStart = null; // Data inizio periodo selezionato
 let selectedPeriodEnd = null; // Data fine periodo selezionato
 let defaultDateApplied = false; // Flag: applica periodo "oggi" solo al primo caricamento
+let displayedCalendarYear = new Date().getFullYear(); // Anno visualizzato nel calendario (solo Gen-Dic)
 
 /**
  * Inizializza il componente detail panel
@@ -64,8 +65,9 @@ function loadPanelContent() {
 						closeBtn.addEventListener('click', closeDetailPanel);
 					}
 
-					// Setup event listeners per i preset buttons
+					// Setup event listeners per i preset buttons e year picker
 					setupPresetButtons();
+					setupYearPicker();
 
 					resolve();
 				})
@@ -87,6 +89,11 @@ function loadPanelContent() {
                                 <button type="button" class="preset-btn" data-preset="next-15-days">Prossimi 15 giorni</button>
                                 <button type="button" class="preset-btn" data-preset="next-month">Prossimo mese</button>
                             </div>
+                            <div class="calendar-year-header-wrapper">
+                                <button type="button" class="calendar-year-btn" id="calendarYearBtn" aria-label="Seleziona anno" aria-expanded="false">2025</button>
+                                <div class="year-picker" id="yearPicker" role="dialog" aria-label="Scegli anno" hidden>
+                                </div>
+                            </div>
                             <div class="calendar-container" id="calendarContainer">
                                 <!-- I calendari mese per mese verranno generati dinamicamente qui -->
                             </div>
@@ -98,8 +105,9 @@ function loadPanelContent() {
 						closeBtn.addEventListener('click', closeDetailPanel);
 					}
 
-					// Setup event listeners per i preset buttons
+					// Setup event listeners per i preset buttons e year picker
 					setupPresetButtons();
+					setupYearPicker();
 
 					resolve();
 				});
@@ -234,52 +242,35 @@ function renderCalendar(data = null) {
 		});
 	});
 
-	// Aggiungi sempre i mesi da gennaio 2024 fino a oggi + 12 mesi
-	const today = new Date();
-	const currentYear = today.getFullYear();
-	const currentMonth = today.getMonth(); // 0-11
-	
-	// Data di inizio: gennaio 2024
-	const startYear = 2024;
-	const startMonth = 0; // Gennaio
-	
-	// Calcola il numero totale di mesi da mostrare: da gennaio 2024 a oggi + 12 mesi
-	const totalMonths = (currentYear - startYear) * 12 + currentMonth + 12;
-
-	for (let i = 0; i < totalMonths; i++) {
-		const month = startMonth + i;
-
-		// Gestisci il cambio anno
-		const actualYear = startYear + Math.floor(month / 12);
-		const actualMonth = month % 12;
-
-		const monthKey = `${actualYear}-${actualMonth}`;
-
-		// Se il mese non è già nella mappa, aggiungilo con array requests vuoto
+	// Mostra sempre solo i 12 mesi dell'anno visualizzato (Gen-Dic)
+	for (let month = 0; month < 12; month++) {
+		const monthKey = `${displayedCalendarYear}-${month}`;
 		if (!monthsMap.has(monthKey)) {
 			monthsMap.set(monthKey, {
-				year: actualYear,
-				month: actualMonth,
+				year: displayedCalendarYear,
+				month: month,
 				requests: []
 			});
 		}
 	}
 
-	// Se c'è un periodo selezionato, assicurati che i suoi mesi siano inclusi anche se non hanno richieste
+	// Se c'è un periodo selezionato, assicurati che i suoi mesi nell'anno visualizzato siano inclusi
 	if (selectedPeriodStart && selectedPeriodEnd) {
 		const startDate = new Date(selectedPeriodStart);
 		const endDate = new Date(selectedPeriodEnd);
 		startDate.setHours(0, 0, 0, 0);
 		endDate.setHours(0, 0, 0, 0);
 
-		// Itera attraverso tutti i mesi nel range del periodo selezionato
 		const currentDate = new Date(startDate);
 		while (currentDate <= endDate) {
 			const year = currentDate.getFullYear();
 			const month = currentDate.getMonth();
+			if (year !== displayedCalendarYear) {
+				currentDate.setMonth(currentDate.getMonth() + 1);
+				currentDate.setDate(1);
+				continue;
+			}
 			const monthKey = `${year}-${month}`;
-
-			// Se il mese non è già nella mappa, aggiungilo con array requests vuoto
 			if (!monthsMap.has(monthKey)) {
 				monthsMap.set(monthKey, {
 					year: year,
@@ -287,15 +278,15 @@ function renderCalendar(data = null) {
 					requests: []
 				});
 			}
-
-			// Passa al mese successivo
 			currentDate.setMonth(currentDate.getMonth() + 1);
-			currentDate.setDate(1); // Imposta al primo giorno del mese
+			currentDate.setDate(1);
 		}
 	}
 
-	// Ordina i mesi cronologicamente (dal più vecchio al più recente)
-	const sortedMonths = Array.from(monthsMap.values()).sort((a, b) => {
+	// Solo i mesi dell'anno visualizzato, ordinati cronologicamente
+	const sortedMonths = Array.from(monthsMap.values())
+		.filter(m => m.year === displayedCalendarYear)
+		.sort((a, b) => {
 		if (a.year !== b.year) {
 			return a.year - b.year;
 		}
@@ -308,14 +299,16 @@ function renderCalendar(data = null) {
 		calendarContainer.appendChild(monthCalendar);
 	});
 
-	// Scrolla automaticamente al mese corrente (solo al primo rendering)
-	// Usa lo stesso meccanismo dei preset buttons
-	if (!window.calendarInitialized) {
+	// Scrolla automaticamente al mese corrente (solo al primo rendering, se l'anno visualizzato è l'anno corrente)
+	const today = new Date();
+	if (!window.calendarInitialized && displayedCalendarYear === today.getFullYear()) {
 		window.calendarInitialized = true;
 		setTimeout(() => {
 			scrollToDate(today, true); // true = senza animazione al primo rendering
 		}, 100);
 	}
+
+	updateCalendarYearButtonText();
 }
 
 /**
@@ -789,6 +782,10 @@ async function applyPeriodoPreset(preset) {
     startDate.setHours(0, 0, 0, 0);
     endDate.setHours(23, 59, 59, 999);
 
+    // Mostra l'anno del preset nel calendario
+    displayedCalendarYear = startDate.getFullYear();
+    updateCalendarYearButtonText();
+
     // Applica il filtro periodo
     await applyPeriodFilter(startDate, endDate);
 
@@ -830,12 +827,79 @@ function scrollToDate(date, instant = false) {
 }
 
 /**
- * Setup event listeners per i preset buttons
+ * Aggiorna il testo del bottone anno con displayedCalendarYear
+ */
+function updateCalendarYearButtonText() {
+	const btn = document.getElementById('calendarYearBtn');
+	if (btn) btn.textContent = displayedCalendarYear;
+}
+
+/**
+ * Popola il year-picker con i bottoni anni e gestisce toggle / selezione
+ */
+function setupYearPicker() {
+	const yearBtn = document.getElementById('calendarYearBtn');
+	const yearPicker = document.getElementById('yearPicker');
+	if (!yearBtn || !yearPicker) return;
+
+	const currentYear = new Date().getFullYear();
+	const yearFrom = currentYear - 5;
+	const yearTo = currentYear + 1;
+
+	yearPicker.innerHTML = '';
+	for (let y = yearFrom; y <= yearTo; y++) {
+		const btn = document.createElement('button');
+		btn.type = 'button';
+		btn.className = 'year-picker-btn';
+		btn.textContent = y;
+		btn.setAttribute('data-year', y);
+		btn.addEventListener('click', function (e) {
+			e.stopPropagation();
+			displayedCalendarYear = parseInt(this.getAttribute('data-year'), 10);
+			closeYearPicker();
+			updateCalendarYearButtonText();
+			renderCalendar();
+			setTimeout(() => {
+				scrollToDate(new Date(displayedCalendarYear, 0, 1), true);
+			}, 50);
+		});
+		yearPicker.appendChild(btn);
+	}
+
+	yearBtn.addEventListener('click', function (e) {
+		e.stopPropagation();
+		const isOpen = yearPicker.hidden === false;
+		if (isOpen) {
+			closeYearPicker();
+		} else {
+			yearPicker.hidden = false;
+			yearBtn.setAttribute('aria-expanded', 'true');
+		}
+	});
+
+	function closeYearPicker() {
+		yearPicker.hidden = true;
+		yearBtn.setAttribute('aria-expanded', 'false');
+	}
+
+	document.addEventListener('click', function closeOnOutsideClick(e) {
+		if (yearPicker.hidden) return;
+		if (!yearPicker.contains(e.target) && e.target !== yearBtn) {
+			closeYearPicker();
+		}
+	});
+
+	updateCalendarYearButtonText();
+}
+
+/**
+ * Setup event listeners per i preset buttons.
+ * Un solo preset alla volta può essere attivo (1 di 6): rimuoviamo active da tutti i preset,
+ * poi lo assegniamo solo al bottone cliccato.
  */
 function setupPresetButtons() {
-    // Selezioniamo tutti i contenitori di preset
     const presetContainers = document.querySelectorAll('.periodo-presets-container');
-    
+
     presetContainers.forEach(container => {
         const presetButtons = container.querySelectorAll('.preset-btn');
 
@@ -843,16 +907,12 @@ function setupPresetButtons() {
             btn.addEventListener('click', function (e) {
                 e.stopPropagation();
 
-                // Rimuovi la classe active SOLO dai bottoni dentro questo specifico contenitore
-                presetButtons.forEach(b => b.classList.remove('active'));
-                
-                // Aggiungi classe active al preset cliccato
+                // Rimuovi active da TUTTI i preset (tutti i container), così solo uno resta attivo
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+
                 this.classList.add('active');
 
                 const preset = this.getAttribute('data-preset');
-                
-                // Applichiamo il preset (la logica di applyPeriodoPreset 
-                // gestirà la differenza tra 'last-month' e 'next-month')
                 applyPeriodoPreset(preset);
             });
         });

@@ -13,6 +13,12 @@
         <button type="button" class="preset-btn" data-preset="next-15-days">Prossimi 15 giorni</button>
         <button type="button" class="preset-btn" data-preset="next-month">Prossimo mese</button>
     </div>
+    <div class="calendar-year-header-wrapper">
+        <button type="button" class="calendar-year-btn" id="calendarYearBtn" aria-label="Seleziona anno" aria-expanded="false">2025</button>
+        <div class="year-picker" id="yearPicker" role="dialog" aria-label="Scegli anno" hidden>
+            <!-- Bottoni anni generati da JS -->
+        </div>
+    </div>
     <div class="calendar-container" id="calendarContainer">
         <!-- I calendari mese per mese verranno generati dinamicamente qui -->
     </div>
