@@ -132,7 +132,7 @@ function createInpsSicknessCard(data) {
                 <span class="sc-pro-type-value">${tipoCertLabel}</span>
             </div>
             <div class="sc-pro-date-box">
-                <span class="sc-pro-date-main">dal ${dataInizio} al ${dataFine}</span>
+                <span class="sc-pro-date-main">${dataInizio} - ${dataFine}</span>
                 <span class="sc-pro-duration">${daysDiff} giorni</span>
             </div>
         </div>
@@ -196,9 +196,8 @@ function createInpsSicknessCard(data) {
 
             <!-- Colonna 3: Info Aggiuntive e Note -->
             <div class="sc-pro-detail-group">
-                <h5>Note & Indicatori</h5>
+                <h5>Note</h5>
                 <div class="sc-pro-field">
-                    <span class="sc-pro-label">Indicatori:</span>
                     <div style="margin-top:4px;">${flagsHtml}</div>
                 </div>
                 <div class="sc-pro-field">

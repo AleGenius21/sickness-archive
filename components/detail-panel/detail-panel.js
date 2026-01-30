@@ -563,11 +563,15 @@ async function handleDayClick(year, month, day) {
 		// Applica il filtro periodo
 		await applyPeriodFilter(selectedPeriodStart, selectedPeriodEnd);
 	} else {
-		// 3° click: resetta e imposta nuova data di inizio
+		// 3° click: uguale al 1° — svuota range e imposta nuova start
 		selectedPeriodStart = new Date(selectedDate);
 		selectedPeriodEnd = null;
-		// Rimuovi il filtro periodo
-		clearPeriodSelection();
+		window.selectedPeriod = {
+			startDate: selectedPeriodStart,
+			endDate: new Date(selectedPeriodStart)
+		};
+		displayedCalendarYear = selectedDate.getFullYear();
+		displayedCalendarYearEnd = null;
 	}
 
 	// Aggiorna il rendering del calendario per mostrare il range
@@ -719,6 +723,10 @@ async function applyPeriodFilter(startDate, endDate) {
  * Resetta la selezione del periodo
  */
 function clearPeriodSelection() {
+	// #region agent log
+	const yearNow = new Date().getFullYear();
+	fetch('http://127.0.0.1:7245/ingest/57d28e5c-5163-4687-8f30-5523f43df14d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'detail-panel.js:clearPeriodSelection:entry',message:'clearPeriodSelection sets displayedCalendarYear to today',data:{displayedCalendarYearSetTo:yearNow},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H2'})}).catch(()=>{});
+	// #endregion
 	selectedPeriodStart = null;
 	selectedPeriodEnd = null;
 	window.selectedPeriod = null;
