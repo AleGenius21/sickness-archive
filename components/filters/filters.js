@@ -766,11 +766,11 @@ function updateFilterOptions(requests) {
 /**
  * Rimuove dinamicamente qualsiasi colore azzurro/blu dal calendario e forza nero
  */
-function removeBlueColors(flatpickrInstance) {
-    if (!flatpickrInstance || !flatpickrInstance.calendarContainer) return;
+function removeBlueColors(calendarIstance) {
+    if (!calendarIstance || !calendarIstance.calendarContainer) return;
     
     // Rimuove qualsiasi colore azzurro/blu da tutti gli elementi del calendario
-    const allElements = flatpickrInstance.calendarContainer.querySelectorAll('*');
+    const allElements = calendarIstance.calendarContainer.querySelectorAll('*');
     allElements.forEach(element => {
         const computed = window.getComputedStyle(element);
         const bgColor = computed.backgroundColor;
@@ -801,8 +801,8 @@ function removeBlueColors(flatpickrInstance) {
     });
     
     // Forza nero per le date selezionate
-    const startRange = flatpickrInstance.calendarContainer.querySelector('.flatpickr-day.startRange');
-    const endRange = flatpickrInstance.calendarContainer.querySelector('.flatpickr-day.endRange');
+    const startRange = calendarIstance.calendarContainer.querySelector('.flatpickr-day.startRange');
+    const endRange = calendarIstance.calendarContainer.querySelector('.flatpickr-day.endRange');
     
     if (startRange) {
         startRange.style.backgroundColor = '#000000';
@@ -817,8 +817,8 @@ function removeBlueColors(flatpickrInstance) {
     }
     
     // Rimuove qualsiasi background azzurro/blu dai container
-    const daysContainer = flatpickrInstance.calendarContainer.querySelector('.flatpickr-days');
-    const dayContainer = flatpickrInstance.calendarContainer.querySelector('.flatpickr-dayContainer');
+    const daysContainer = calendarIstance.calendarContainer.querySelector('.flatpickr-days');
+    const dayContainer = calendarIstance.calendarContainer.querySelector('.flatpickr-dayContainer');
     
     if (daysContainer) {
         daysContainer.style.backgroundColor = 'transparent';
@@ -831,8 +831,8 @@ function removeBlueColors(flatpickrInstance) {
     }
     
     // Rimuove qualsiasi elemento wrapper o pseudo-elemento che potrebbe creare la barra azzurra
-    const startRangeDays = flatpickrInstance.calendarContainer.querySelectorAll('.flatpickr-day.startRange');
-    const endRangeDays = flatpickrInstance.calendarContainer.querySelectorAll('.flatpickr-day.endRange');
+    const startRangeDays = calendarIstance.calendarContainer.querySelectorAll('.flatpickr-day.startRange');
+    const endRangeDays = calendarIstance.calendarContainer.querySelectorAll('.flatpickr-day.endRange');
     
     startRangeDays.forEach(day => {
         // Rimuove qualsiasi pseudo-elemento
@@ -891,8 +891,8 @@ function removeBlueColors(flatpickrInstance) {
 /**
  * Setup observer per monitorare cambiamenti dinamici e rimuovere colori azzurri
  */
-function setupColorObserver(flatpickrInstance) {
-    if (!flatpickrInstance || !flatpickrInstance.calendarContainer) return;
+function setupColorObserver(calendarIstance) {
+    if (!calendarIstance || !calendarIstance.calendarContainer) return;
     
     const observer = new MutationObserver(function(mutations) {
         let shouldRemoveBlue = false;
@@ -924,13 +924,13 @@ function setupColorObserver(flatpickrInstance) {
         
         if (shouldRemoveBlue) {
             setTimeout(() => {
-                removeBlueColors(flatpickrInstance);
+                removeBlueColors(calendarIstance);
             }, 10);
         }
     });
     
     // Osserva cambiamenti nel container del calendario
-    observer.observe(flatpickrInstance.calendarContainer, {
+    observer.observe(calendarIstance.calendarContainer, {
         attributes: true,
         attributeFilter: ['style', 'class'],
         childList: true,
@@ -940,12 +940,12 @@ function setupColorObserver(flatpickrInstance) {
 
 /**
  * Personalizza l'anno nella vista mensile - ingrandisce e migliora lo stile
- * @param {Object} flatpickrInstance - Istanza di Flatpickr
+ * @param {Object} calendarIstance - Istanza di Flatpickr
  */
-function customizeYearInMonthView(flatpickrInstance) {
-    if (!flatpickrInstance || !flatpickrInstance.calendarContainer) return;
+function customizeYearInMonthView(calendarIstance) {
+    if (!calendarIstance || !calendarIstance.calendarContainer) return;
     
-    const calendarContainer = flatpickrInstance.calendarContainer;
+    const calendarContainer = calendarIstance.calendarContainer;
     const currentMonth = calendarContainer.querySelector('.flatpickr-current-month');
     
     if (!currentMonth) return;
@@ -1001,12 +1001,12 @@ function customizeYearInMonthView(flatpickrInstance) {
 
 /**
  * Setup observer per monitorare quando cambia il mese/anno e riapplicare gli stili
- * @param {Object} flatpickrInstance - Istanza di Flatpickr
+ * @param {Object} calendarIstance - Istanza di Flatpickr
  */
-function setupYearDisplayObserver(flatpickrInstance) {
-    if (!flatpickrInstance || !flatpickrInstance.calendarContainer) return;
+function setupYearDisplayObserver(calendarIstance) {
+    if (!calendarIstance || !calendarIstance.calendarContainer) return;
     
-    const calendarContainer = flatpickrInstance.calendarContainer;
+    const calendarContainer = calendarIstance.calendarContainer;
     
     // Observer per monitorare quando cambia il contenuto del current-month
     const observer = new MutationObserver(function(mutations) {
@@ -1014,7 +1014,7 @@ function setupYearDisplayObserver(flatpickrInstance) {
             if (mutation.type === 'childList' || mutation.type === 'characterData') {
                 // Riapplica gli stili all'anno quando cambia
                 setTimeout(() => {
-                    customizeYearInMonthView(flatpickrInstance);
+                    customizeYearInMonthView(calendarIstance);
                 }, 50);
             }
         });
@@ -1036,7 +1036,7 @@ function setupYearDisplayObserver(flatpickrInstance) {
     if (prevMonth) {
         prevMonth.addEventListener('click', function() {
             setTimeout(() => {
-                customizeYearInMonthView(flatpickrInstance);
+                customizeYearInMonthView(calendarIstance);
             }, 200);
         });
     }
@@ -1044,7 +1044,7 @@ function setupYearDisplayObserver(flatpickrInstance) {
     if (nextMonth) {
         nextMonth.addEventListener('click', function() {
             setTimeout(() => {
-                customizeYearInMonthView(flatpickrInstance);
+                customizeYearInMonthView(calendarIstance);
             }, 200);
         });
     }

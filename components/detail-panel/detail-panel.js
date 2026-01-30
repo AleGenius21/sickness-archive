@@ -14,6 +14,7 @@ let selectedPeriodStart = null; // Data inizio periodo selezionato
 let selectedPeriodEnd = null; // Data fine periodo selezionato
 let defaultDateApplied = false; // Flag: applica periodo "oggi" solo al primo caricamento
 let displayedCalendarYear = new Date().getFullYear(); // Anno visualizzato nel calendario (solo Gen-Dic)
+let displayedCalendarYearEnd = null; // Secondo anno quando periodo a cavallo tra due anni (24 mesi)
 
 /**
  * Inizializza il componente detail panel
@@ -242,19 +243,26 @@ function renderCalendar(data = null) {
 		});
 	});
 
-	// Mostra sempre solo i 12 mesi dell'anno visualizzato (Gen-Dic)
-	for (let month = 0; month < 12; month++) {
-		const monthKey = `${displayedCalendarYear}-${month}`;
-		if (!monthsMap.has(monthKey)) {
-			monthsMap.set(monthKey, {
-				year: displayedCalendarYear,
-				month: month,
-				requests: []
-			});
-		}
-	}
+	// Anni da mostrare: due anni se periodo a cavallo (displayedCalendarYearEnd), altrimenti uno
+	const yearsToDisplay = displayedCalendarYearEnd != null
+		? [Math.min(displayedCalendarYear, displayedCalendarYearEnd), Math.max(displayedCalendarYear, displayedCalendarYearEnd)]
+		: [displayedCalendarYear];
 
-	// Se c'è un periodo selezionato, assicurati che i suoi mesi nell'anno visualizzato siano inclusi
+	// Popola monthsMap con i 12 mesi per ogni anno da mostrare
+	yearsToDisplay.forEach(year => {
+		for (let month = 0; month < 12; month++) {
+			const monthKey = `${year}-${month}`;
+			if (!monthsMap.has(monthKey)) {
+				monthsMap.set(monthKey, {
+					year: year,
+					month: month,
+					requests: []
+				});
+			}
+		}
+	});
+
+	// Se c'è un periodo selezionato, assicurati che i suoi mesi negli anni visualizzati siano inclusi
 	if (selectedPeriodStart && selectedPeriodEnd) {
 		const startDate = new Date(selectedPeriodStart);
 		const endDate = new Date(selectedPeriodEnd);
@@ -265,7 +273,7 @@ function renderCalendar(data = null) {
 		while (currentDate <= endDate) {
 			const year = currentDate.getFullYear();
 			const month = currentDate.getMonth();
-			if (year !== displayedCalendarYear) {
+			if (!yearsToDisplay.includes(year)) {
 				currentDate.setMonth(currentDate.getMonth() + 1);
 				currentDate.setDate(1);
 				continue;
@@ -283,15 +291,15 @@ function renderCalendar(data = null) {
 		}
 	}
 
-	// Solo i mesi dell'anno visualizzato, ordinati cronologicamente
+	// Mesi degli anni visualizzati, ordinati cronologicamente (12 o 24 mesi)
 	const sortedMonths = Array.from(monthsMap.values())
-		.filter(m => m.year === displayedCalendarYear)
+		.filter(m => yearsToDisplay.includes(m.year))
 		.sort((a, b) => {
-		if (a.year !== b.year) {
-			return a.year - b.year;
-		}
-		return a.month - b.month;
-	});
+			if (a.year !== b.year) {
+				return a.year - b.year;
+			}
+			return a.month - b.month;
+		});
 
 	// Genera calendario per ogni mese in ordine cronologico
 	sortedMonths.forEach(monthData => {
@@ -299,9 +307,9 @@ function renderCalendar(data = null) {
 		calendarContainer.appendChild(monthCalendar);
 	});
 
-	// Scrolla automaticamente al mese corrente (solo al primo rendering, se l'anno visualizzato è l'anno corrente)
+	// Scrolla automaticamente al mese corrente (solo al primo rendering, se l'anno corrente è tra quelli visualizzati)
 	const today = new Date();
-	if (!window.calendarInitialized && displayedCalendarYear === today.getFullYear()) {
+	if (!window.calendarInitialized && yearsToDisplay.includes(today.getFullYear())) {
 		window.calendarInitialized = true;
 		setTimeout(() => {
 			scrollToDate(today, true); // true = senza animazione al primo rendering
@@ -402,6 +410,13 @@ function generateMonthCalendar(year, month, requests, selectedRequest) {
 
 		// Aggiungi classe sunday se è domenica
 		const dayOfWeek = new Date(year, month, day).getDay();
+		const isoDate = `${year}-${month}-${day}`;
+		// Verifica se "isoDate" è dentro all'array delle HOLIDAYS preso da chiamata di config
+
+//		if (isoDate è inclusa nell'array) { 
+//			dayNumber.classList.add('holiday');
+//		}
+	
 		if (dayOfWeek === 0) { // 0 = Domenica
 			dayNumber.classList.add('sunday');
 		}
@@ -602,6 +617,17 @@ async function applyPeriodFilter(startDate, endDate) {
 	selectedPeriodStart = normalizedStart;
 	selectedPeriodEnd = normalizedEnd;
 
+	// Allinea anni mostrati al periodo: due anni se a cavallo, altrimenti uno
+	const startYear = normalizedStart.getFullYear();
+	const endYear = normalizedEnd.getFullYear();
+	if (startYear !== endYear) {
+		displayedCalendarYear = startYear;
+		displayedCalendarYearEnd = endYear;
+	} else {
+		displayedCalendarYear = startYear;
+		displayedCalendarYearEnd = null;
+	}
+
 	// Aggiorna window.selectedPeriod per sincronizzazione con filtri
 	window.selectedPeriod = {
 		startDate: normalizedStart,
@@ -692,6 +718,8 @@ function clearPeriodSelection() {
 	selectedPeriodStart = null;
 	selectedPeriodEnd = null;
 	window.selectedPeriod = null;
+	displayedCalendarYearEnd = null;
+	displayedCalendarYear = new Date().getFullYear();
 
 	// Rimuovi evidenziazione visiva dal calendario
 	const periodDays = document.querySelectorAll('.calendar-day.period-start, .calendar-day.period-end, .calendar-day.period-range');
@@ -782,8 +810,16 @@ async function applyPeriodoPreset(preset) {
     startDate.setHours(0, 0, 0, 0);
     endDate.setHours(23, 59, 59, 999);
 
-    // Mostra l'anno del preset nel calendario
-    displayedCalendarYear = startDate.getFullYear();
+    // Mostra uno o due anni nel calendario a seconda che il periodo sia a cavallo
+    const startYear = startDate.getFullYear();
+    const endYear = endDate.getFullYear();
+    if (startYear !== endYear) {
+        displayedCalendarYear = startYear;
+        displayedCalendarYearEnd = endYear;
+    } else {
+        displayedCalendarYear = startYear;
+        displayedCalendarYearEnd = null;
+    }
     updateCalendarYearButtonText();
 
     // Applica il filtro periodo
@@ -827,24 +863,27 @@ function scrollToDate(date, instant = false) {
 }
 
 /**
- * Aggiorna il testo del bottone anno con displayedCalendarYear
+ * Aggiorna il testo del bottone anno con displayedCalendarYear (e displayedCalendarYearEnd se due anni)
  */
 function updateCalendarYearButtonText() {
 	const btn = document.getElementById('calendarYearBtn');
-	if (btn) btn.textContent = displayedCalendarYear;
+	if (!btn) return;
+	btn.textContent = displayedCalendarYearEnd != null
+		? `${displayedCalendarYear} – ${displayedCalendarYearEnd}`
+		: displayedCalendarYear;
 }
 
 /**
- * Popola il year-picker con i bottoni anni e gestisce toggle / selezione
+ * Ripopola il year-picker con il range che include displayedCalendarYear e displayedCalendarYearEnd
  */
-function setupYearPicker() {
-	const yearBtn = document.getElementById('calendarYearBtn');
+function populateYearPicker() {
 	const yearPicker = document.getElementById('yearPicker');
-	if (!yearBtn || !yearPicker) return;
+	if (!yearPicker) return;
 
 	const currentYear = new Date().getFullYear();
-	const yearFrom = currentYear - 5;
-	const yearTo = currentYear + 1;
+	const endYearForRange = displayedCalendarYearEnd != null ? displayedCalendarYearEnd : displayedCalendarYear;
+	const yearFrom = Math.min(currentYear - 5, displayedCalendarYear, endYearForRange);
+	const yearTo = Math.max(currentYear + 1, displayedCalendarYear, endYearForRange);
 
 	yearPicker.innerHTML = '';
 	for (let y = yearFrom; y <= yearTo; y++) {
@@ -856,6 +895,7 @@ function setupYearPicker() {
 		btn.addEventListener('click', function (e) {
 			e.stopPropagation();
 			displayedCalendarYear = parseInt(this.getAttribute('data-year'), 10);
+			displayedCalendarYearEnd = null; // Vista singolo anno
 			closeYearPicker();
 			updateCalendarYearButtonText();
 			renderCalendar();
@@ -865,6 +905,24 @@ function setupYearPicker() {
 		});
 		yearPicker.appendChild(btn);
 	}
+}
+
+function closeYearPicker() {
+	const yearPicker = document.getElementById('yearPicker');
+	const yearBtn = document.getElementById('calendarYearBtn');
+	if (yearPicker) yearPicker.hidden = true;
+	if (yearBtn) yearBtn.setAttribute('aria-expanded', 'false');
+}
+
+/**
+ * Setup event listeners del year-picker (toggle, click outside). Popolamento fatto da populateYearPicker.
+ */
+function setupYearPicker() {
+	const yearBtn = document.getElementById('calendarYearBtn');
+	const yearPicker = document.getElementById('yearPicker');
+	if (!yearBtn || !yearPicker) return;
+
+	populateYearPicker();
 
 	yearBtn.addEventListener('click', function (e) {
 		e.stopPropagation();
@@ -872,15 +930,11 @@ function setupYearPicker() {
 		if (isOpen) {
 			closeYearPicker();
 		} else {
+			populateYearPicker(); // Range aggiornato con anni attualmente mostrati
 			yearPicker.hidden = false;
 			yearBtn.setAttribute('aria-expanded', 'true');
 		}
 	});
-
-	function closeYearPicker() {
-		yearPicker.hidden = true;
-		yearBtn.setAttribute('aria-expanded', 'false');
-	}
 
 	document.addEventListener('click', function closeOnOutsideClick(e) {
 		if (yearPicker.hidden) return;

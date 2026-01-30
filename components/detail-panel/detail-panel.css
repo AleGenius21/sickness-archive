@@ -148,7 +148,7 @@
 /* Calendar year header (sticky) */
 .calendar-year-header-wrapper {
     position: sticky;
-    top: 0;
+    top: -13px;
     z-index: 2;
     background-color: #ffffff;
     padding: 8px 0 8px 0;
@@ -331,7 +331,8 @@
 }
 
 /* Sunday - numero rosso per domeniche */
-.calendar-day-number.sunday {
+.calendar-day-number.sunday,
+.calendar-day-number.holiday {
     color: #db0000; /* red-500 */
     font-size: 0.85rem;
     font-weight: 600;
