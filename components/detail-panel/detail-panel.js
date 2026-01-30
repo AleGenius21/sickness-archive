@@ -15,6 +15,7 @@ let selectedPeriodEnd = null; // Data fine periodo selezionato
 let defaultDateApplied = false; // Flag: applica periodo "oggi" solo al primo caricamento
 let displayedCalendarYear = new Date().getFullYear(); // Anno visualizzato nel calendario (solo Gen-Dic)
 let displayedCalendarYearEnd = null; // Secondo anno quando periodo a cavallo tra due anni (24 mesi)
+let yearPickerWindowStart = null; // Inizio finestra 12 anni nel dropdown (per frecce prev/next)
 
 /**
  * Inizializza il componente detail panel
@@ -91,7 +92,10 @@ function loadPanelContent() {
                                 <button type="button" class="preset-btn" data-preset="next-month">Prossimo mese</button>
                             </div>
                             <div class="calendar-year-header-wrapper">
-                                <button type="button" class="calendar-year-btn" id="calendarYearBtn" aria-label="Seleziona anno" aria-expanded="false">2025</button>
+                                <div class="calendar-year-input-wrapper" aria-expanded="false">
+                                    <input type="text" id="calendarYearInput" class="calendar-year-input" inputmode="numeric" pattern="[0-9\s\-]*" aria-label="Anno" aria-haspopup="dialog" aria-controls="yearPicker" />
+                                    <span class="calendar-year-range-suffix" id="calendarYearRangeSuffix" aria-hidden="true"></span>
+                                </div>
                                 <div class="year-picker" id="yearPicker" role="dialog" aria-label="Scegli anno" hidden>
                                 </div>
                             </div>
@@ -316,7 +320,7 @@ function renderCalendar(data = null) {
 		}, 100);
 	}
 
-	updateCalendarYearButtonText();
+	updateCalendarYearInput();
 }
 
 /**
@@ -820,7 +824,7 @@ async function applyPeriodoPreset(preset) {
         displayedCalendarYear = startYear;
         displayedCalendarYearEnd = null;
     }
-    updateCalendarYearButtonText();
+    updateCalendarYearInput();
 
     // Applica il filtro periodo
     await applyPeriodFilter(startDate, endDate);
@@ -863,87 +867,185 @@ function scrollToDate(date, instant = false) {
 }
 
 /**
- * Aggiorna il testo del bottone anno con displayedCalendarYear (e displayedCalendarYearEnd se due anni)
+ * Aggiorna il valore dell'input anno: un anno (es. "2025") o due anni (es. "2025 - 2026") dentro calendarYearInput.
  */
-function updateCalendarYearButtonText() {
-	const btn = document.getElementById('calendarYearBtn');
-	if (!btn) return;
-	btn.textContent = displayedCalendarYearEnd != null
-		? `${displayedCalendarYear} – ${displayedCalendarYearEnd}`
-		: displayedCalendarYear;
+function updateCalendarYearInput() {
+	const input = document.getElementById('calendarYearInput');
+	const suffix = document.getElementById('calendarYearRangeSuffix');
+	if (!input) return;
+	if (displayedCalendarYearEnd != null) {
+		input.value = displayedCalendarYear + ' - ' + displayedCalendarYearEnd;
+	} else {
+		input.value = String(displayedCalendarYear);
+	}
+	if (suffix) {
+		suffix.textContent = '';
+		suffix.style.display = 'none';
+	}
 }
 
+const YEAR_PICKER_MIN = 1900;
+const YEAR_PICKER_MAX = 2100;
+const YEAR_PICKER_WINDOW_SIZE = 12;
+
 /**
- * Ripopola il year-picker con il range che include displayedCalendarYear e displayedCalendarYearEnd
+ * Ripopola il year-picker: header (prev/next + range) + griglia 4x3 di 12 anni.
+ * yearPickerWindowStart definisce il primo anno della finestra; se null viene centrata su displayedCalendarYear.
  */
 function populateYearPicker() {
 	const yearPicker = document.getElementById('yearPicker');
 	if (!yearPicker) return;
 
-	const currentYear = new Date().getFullYear();
-	const endYearForRange = displayedCalendarYearEnd != null ? displayedCalendarYearEnd : displayedCalendarYear;
-	const yearFrom = Math.min(currentYear - 5, displayedCalendarYear, endYearForRange);
-	const yearTo = Math.max(currentYear + 1, displayedCalendarYear, endYearForRange);
+	if (yearPickerWindowStart == null) {
+		// Centra la finestra su displayedCalendarYear (5 prima, 6 dopo)
+		yearPickerWindowStart = Math.max(YEAR_PICKER_MIN, displayedCalendarYear - 5);
+		yearPickerWindowStart = Math.min(yearPickerWindowStart, YEAR_PICKER_MAX - YEAR_PICKER_WINDOW_SIZE + 1);
+	}
+	const startYear = yearPickerWindowStart;
+	const endYear = Math.min(startYear + YEAR_PICKER_WINDOW_SIZE - 1, YEAR_PICKER_MAX);
 
 	yearPicker.innerHTML = '';
-	for (let y = yearFrom; y <= yearTo; y++) {
+
+	// Header: prev, label range, next
+	const header = document.createElement('div');
+	header.className = 'year-picker-header';
+	const btnPrev = document.createElement('button');
+	btnPrev.type = 'button';
+	btnPrev.className = 'year-picker-nav-btn';
+	btnPrev.setAttribute('aria-label', 'Anni precedenti');
+	btnPrev.textContent = '\u2039'; // single left-pointing angle
+	const labelCenter = document.createElement('span');
+	labelCenter.className = 'year-picker-header-label';
+	labelCenter.textContent = startYear === endYear ? String(startYear) : startYear + ' – ' + endYear;
+	const btnNext = document.createElement('button');
+	btnNext.type = 'button';
+	btnNext.className = 'year-picker-nav-btn';
+	btnNext.setAttribute('aria-label', 'Anni successivi');
+	btnNext.textContent = '\u203A'; // single right-pointing angle
+
+	btnPrev.addEventListener('click', function (e) {
+		e.stopPropagation();
+		yearPickerWindowStart = Math.max(YEAR_PICKER_MIN, startYear - YEAR_PICKER_WINDOW_SIZE);
+		populateYearPicker();
+	});
+	btnNext.addEventListener('click', function (e) {
+		e.stopPropagation();
+		yearPickerWindowStart = Math.min(YEAR_PICKER_MAX - YEAR_PICKER_WINDOW_SIZE + 1, startYear + YEAR_PICKER_WINDOW_SIZE);
+		populateYearPicker();
+	});
+
+	header.appendChild(btnPrev);
+	header.appendChild(labelCenter);
+	header.appendChild(btnNext);
+	yearPicker.appendChild(header);
+
+	// Griglia 4x3
+	const grid = document.createElement('div');
+	grid.className = 'year-picker-grid';
+	for (let y = startYear; y <= endYear; y++) {
 		const btn = document.createElement('button');
 		btn.type = 'button';
-		btn.className = 'year-picker-btn';
+		btn.className = 'year-picker-btn' + (y === displayedCalendarYear ? ' selected' : '');
 		btn.textContent = y;
 		btn.setAttribute('data-year', y);
+		if (y === displayedCalendarYear) btn.setAttribute('aria-pressed', 'true');
 		btn.addEventListener('click', function (e) {
 			e.stopPropagation();
 			displayedCalendarYear = parseInt(this.getAttribute('data-year'), 10);
-			displayedCalendarYearEnd = null; // Vista singolo anno
+			displayedCalendarYearEnd = null;
 			closeYearPicker();
-			updateCalendarYearButtonText();
+			updateCalendarYearInput();
 			renderCalendar();
 			setTimeout(() => {
 				scrollToDate(new Date(displayedCalendarYear, 0, 1), true);
 			}, 50);
 		});
-		yearPicker.appendChild(btn);
+		grid.appendChild(btn);
 	}
+	yearPicker.appendChild(grid);
 }
 
 function closeYearPicker() {
 	const yearPicker = document.getElementById('yearPicker');
-	const yearBtn = document.getElementById('calendarYearBtn');
+	const wrapper = document.querySelector('.calendar-year-input-wrapper');
 	if (yearPicker) yearPicker.hidden = true;
-	if (yearBtn) yearBtn.setAttribute('aria-expanded', 'false');
+	if (wrapper) wrapper.setAttribute('aria-expanded', 'false');
 }
 
 /**
- * Setup event listeners del year-picker (toggle, click outside). Popolamento fatto da populateYearPicker.
+ * Setup event listeners del year-picker (toggle su input, click outside). Popolamento fatto da populateYearPicker.
  */
 function setupYearPicker() {
-	const yearBtn = document.getElementById('calendarYearBtn');
+	const yearInput = document.getElementById('calendarYearInput');
 	const yearPicker = document.getElementById('yearPicker');
-	if (!yearBtn || !yearPicker) return;
+	const wrapper = document.querySelector('.calendar-year-input-wrapper');
+	if (!yearInput || !yearPicker) return;
 
 	populateYearPicker();
 
-	yearBtn.addEventListener('click', function (e) {
+	function openPicker() {
+		yearPickerWindowStart = null; // Ricalcola finestra centrata su displayedCalendarYear
+		populateYearPicker();
+		yearPicker.hidden = false;
+		if (wrapper) wrapper.setAttribute('aria-expanded', 'true');
+	}
+
+	yearInput.addEventListener('focus', function (e) {
 		e.stopPropagation();
-		const isOpen = yearPicker.hidden === false;
-		if (isOpen) {
-			closeYearPicker();
+		openPicker();
+	});
+	yearInput.addEventListener('click', function (e) {
+		e.stopPropagation();
+		if (yearPicker.hidden) openPicker();
+	});
+
+	function parseYearInputValue(str) {
+		const s = String(str).trim();
+		const single = /^\s*(\d{4})\s*$/;
+		const range = /^\s*(\d{4})\s*-\s*(\d{4})\s*$/;
+		let m = s.match(range);
+		if (m) {
+			const a = parseInt(m[1], 10);
+			const b = parseInt(m[2], 10);
+			if (a >= YEAR_PICKER_MIN && a <= YEAR_PICKER_MAX && b >= YEAR_PICKER_MIN && b <= YEAR_PICKER_MAX)
+				return { single: false, start: Math.min(a, b), end: Math.max(a, b) };
+		}
+		m = s.match(single);
+		if (m) {
+			const val = parseInt(m[1], 10);
+			if (val >= YEAR_PICKER_MIN && val <= YEAR_PICKER_MAX)
+				return { single: true, start: val, end: null };
+		}
+		return null;
+	}
+
+	yearInput.addEventListener('change', function () {
+		const parsed = parseYearInputValue(yearInput.value);
+		if (parsed) {
+			displayedCalendarYear = parsed.start;
+			displayedCalendarYearEnd = parsed.single ? null : parsed.end;
+			updateCalendarYearInput();
+			renderCalendar();
+			setTimeout(() => scrollToDate(new Date(displayedCalendarYear, 0, 1), true), 50);
 		} else {
-			populateYearPicker(); // Range aggiornato con anni attualmente mostrati
-			yearPicker.hidden = false;
-			yearBtn.setAttribute('aria-expanded', 'true');
+			updateCalendarYearInput();
+		}
+	});
+	yearInput.addEventListener('blur', function () {
+		const parsed = parseYearInputValue(yearInput.value);
+		if (!parsed) {
+			updateCalendarYearInput();
 		}
 	});
 
 	document.addEventListener('click', function closeOnOutsideClick(e) {
 		if (yearPicker.hidden) return;
-		if (!yearPicker.contains(e.target) && e.target !== yearBtn) {
+		if (!yearPicker.contains(e.target) && e.target !== yearInput && !wrapper.contains(e.target)) {
 			closeYearPicker();
 		}
 	});
 
-	updateCalendarYearButtonText();
+	updateCalendarYearInput();
 }
 
 /**

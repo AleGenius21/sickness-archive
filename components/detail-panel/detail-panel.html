@@ -14,9 +14,12 @@
         <button type="button" class="preset-btn" data-preset="next-month">Prossimo mese</button>
     </div>
     <div class="calendar-year-header-wrapper">
-        <button type="button" class="calendar-year-btn" id="calendarYearBtn" aria-label="Seleziona anno" aria-expanded="false">2025</button>
+        <div class="calendar-year-input-wrapper" aria-expanded="false">
+            <input type="text" id="calendarYearInput" class="calendar-year-input" inputmode="numeric" pattern="[0-9\s\-]*" aria-label="Anno" aria-haspopup="dialog" aria-controls="yearPicker" />
+            <span class="calendar-year-range-suffix" id="calendarYearRangeSuffix" aria-hidden="true"></span>
+        </div>
         <div class="year-picker" id="yearPicker" role="dialog" aria-label="Scegli anno" hidden>
-            <!-- Bottoni anni generati da JS -->
+            <!-- Header e griglia anni generati da JS -->
         </div>
     </div>
     <div class="calendar-container" id="calendarContainer">
