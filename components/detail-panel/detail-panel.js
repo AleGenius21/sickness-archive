@@ -537,6 +537,8 @@ function generateMonthCalendar(year, month, requests, selectedRequest) {
  * @param {number} day - Giorno
  */
 async function handleDayClick(year, month, day) {
+	clearPresetActiveState();
+
 	// Crea oggetto Date per il giorno selezionato
 	const selectedDate = new Date(year, month, day);
 	selectedDate.setHours(0, 0, 0, 0);
@@ -720,6 +722,13 @@ async function applyPeriodFilter(startDate, endDate) {
 }
 
 /**
+ * Rimuove la classe active da tutti i pulsanti preset (stato visivo: nessun preset selezionato).
+ */
+function clearPresetActiveState() {
+	document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+}
+
+/**
  * Resetta la selezione del periodo
  */
 function clearPeriodSelection() {
@@ -739,9 +748,7 @@ function clearPeriodSelection() {
 		el.classList.remove('period-start', 'period-end', 'period-range');
 	});
 
-	// Rimuovi classe active dai preset buttons
-	const presetButtons = document.querySelectorAll('.preset-btn');
-	presetButtons.forEach(btn => btn.classList.remove('active'));
+	clearPresetActiveState();
 
 	// Nascondi lo spinner del filter-bar per assicurarsi che i filtri siano cliccabili
 	if (typeof window.hideFilterSpinner === 'function') {
